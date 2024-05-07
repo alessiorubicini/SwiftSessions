@@ -7,7 +7,9 @@ class Chan<A, B> {
     init(channel: AsyncChannel<AnyObject>) {
         self.channel = channel
     }
-    
+}
+
+extension Chan {
     static func create() -> (Chan<A, B>, Chan<B, A>) {
         let channel: AsyncChannel<AnyObject> = AsyncChannel()
         let c1 = Chan<A, B>(channel: channel)
@@ -15,25 +17,16 @@ class Chan<A, B> {
         return (c1, c2)
     }
     
-    static func send(payload: A, on chan: consuming Chan<A, B>) async {
-        // Invio il messaggio sul canale
-        await chan.channel.send(payload as AnyObject)
-        chan.channel.finish()
-        // Ritorno il canale di continuazione
-        // return ...
+    static func send(_ payload: A, on channel: consuming Chan<A, B>) async {
+        await channel.channel.send(payload as AnyObject)
+        channel.channel.finish()
     }
     
-    static func recv(from chan: consuming Chan<B, A>) async {
-        // Leggo il messaggio dal canale
-        for await res in chan.channel {
-            print("Result: \(res)")
-            break
-        }
-        // Ritorno il canale di continuazione
-        // return ...
+    static func recv(from channel: consuming Chan<B, A>) async -> AnyObject {
+        return await channel.channel.first(where: { _ in true })!
     }
     
     static func close(channel: consuming Chan<A, B>) async {
-        
+        return
     }
 }

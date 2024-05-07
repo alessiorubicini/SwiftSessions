@@ -11,11 +11,12 @@ final class SwiftSessionsTests: XCTestCase {
         
         Task {
             let continuation = Chan<Bool, Empty>(channel: c1.channel)
-            await Session.send(payload: (42, continuation), on: c1)
+            await Session.send((42, continuation), on: c1)
         }
 
         Task {
-            await Session.recv(from: c2)
+            let res = await Session.recv(from: c2)
+            print("RESULT: [\(res)]")
         }
     }
 }
