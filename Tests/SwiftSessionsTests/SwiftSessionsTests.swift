@@ -4,23 +4,23 @@ import XCTest
 @testable import SwiftSessions
 
 final class SwiftSessionsTests: XCTestCase {
+    
     func test1() async {
-        typealias Session = Chan<(Int, Chan<Bool, Empty>), Empty>
-        var (c1, c2) = Session.create()
+        typealias Session = Chan<(Int, Chan<(Bool, Chan<Empty, Empty>), Empty>), Empty>
         
-        // Invio l'intero
-        let c3 = await Session.send(42, on: c1)
+        var c = await Session.create({ c in
+            var (num, c) = await Session.recv(from: c)
+            let end = await Session.send(num % 2 == 0, on: c)
+            await Session.close(end)
+        })
         
-        // Ricevo l'intero e la continuazione
-        let (num, send_c) = await Session.recv(from: c2)
-
-        // Invio il booleano
-        let isEven = (num % 2 == 0)
-        let c4 = await Session.send(isEven, on: send_c)
+        let c1 = await Session.send(42, on: c)
         
-        // Ricevo il booleano
-        let b = await Session.recv(from: c4)
-        print("Result: \(b)")
+        let (isEven, c2) = await Session.recv(from: c1)
+        
+        await Session.close(c2)
+        
+        print(isEven)
     }
 }
 

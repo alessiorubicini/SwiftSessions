@@ -8,11 +8,15 @@ final class Chan<A, B> {
         self.channel = channel
     }
     
-    static func create() -> (Chan<A, B>, Chan<B, A>) {
+    static func create(_ closure: @escaping (_: Chan<B, A>) async -> Void) async -> Chan<A, B> {
         let channel: AsyncChannel<AnyObject> = AsyncChannel()
         let c1 = Chan<A, B>(channel: channel)
         let c2 = Chan<B, A>(channel: channel)
-        return (c1, c2)
+        // Run closure here...
+        DispatchQueue.global().async {
+            await closure(c2)
+        }
+        return c1
     }
     
     static func send<A, B, C>(_ payload: A, on chan: consuming Chan<(A, Chan<B, C>), Empty>) async -> Chan<C, B> {
@@ -30,7 +34,8 @@ final class Chan<A, B> {
         return (msg as! A, chan as! Chan<B, C>)
     }
     
-    static func close(channel: consuming Chan<Empty, Empty>) async {
+    static func close(_ channel: consuming Chan<Empty, Empty>) async {
         return
     }
+    
 }
