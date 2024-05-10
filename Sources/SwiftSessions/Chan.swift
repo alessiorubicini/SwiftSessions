@@ -22,7 +22,7 @@ final class Chan<A, B> {
         let channel: AsyncChannel<AnyObject> = AsyncChannel()
         let c1 = Chan<A, B>(channel: channel)
         let c2 = Chan<B, A>(channel: channel)
-        Task.detached {
+        Task {
             await closure(c2)
         }
         return c1
@@ -31,7 +31,7 @@ final class Chan<A, B> {
     /// Sends a message of type `A` on the channel and returns the continuation channel
     /// - Parameters:
     ///   - payload: The payload to be sent on the channel.
-    ///   - chan: The channel from which the payload is sent.
+    ///   - chan: The channel on which the payload is sent.
     /// - Returns: The continuation channel
     static func send<A, B, C>(_ payload: A, on chan: consuming Chan<(A, Chan<B, C>), Empty>) async -> Chan<C, B> {
         await chan.channel.send(payload as AnyObject)
