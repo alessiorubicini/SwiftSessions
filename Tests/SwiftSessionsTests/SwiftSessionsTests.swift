@@ -10,7 +10,7 @@ final class SwiftSessionsTests: XCTestCase {
         let c = await Session.create({ c in
             let (num, c) = await Session.recv(from: c)
             let end = await Session.send(num % 2 == 0, on: c)
-            await Session.close(end)
+            Session.close(end)
         })
         
         let c1 = await Session.send(42, on: c)
