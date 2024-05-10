@@ -48,7 +48,7 @@ final class Chan<A, B> {
     
     /// Closes the channel, indicating the end of communication.
     /// - Parameter channel: The channel to be closed.
-    static func close(_ channel: consuming Chan<Empty, Empty>) async {
+    static func close(_ channel: consuming Chan<Empty, Empty>) {
         return
     }
     

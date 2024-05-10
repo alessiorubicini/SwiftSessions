@@ -17,7 +17,7 @@ final class SwiftSessionsTests: XCTestCase {
         
         let (isEven, c2) = await Session.recv(from: c1)
         
-        await Session.close(c2)
+        Session.close(c2)
         
         assert(isEven == true)
     }
