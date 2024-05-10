@@ -28,27 +28,28 @@ final class Chan<A, B> {
         return c1
     }
     
-    /// Sends a message of type `A` on the channel and returns the continuation channel
+    /// Sends a message on the channel and returns the continuation channel
     /// - Parameters:
     ///   - payload: The payload to be sent on the channel.
     ///   - chan: The channel on which the payload is sent.
     /// - Returns: The continuation channel
-    static func send<A, B, C>(_ payload: A, on chan: consuming Chan<(A, Chan<B, C>), Empty>) async -> Chan<C, B> {
+    static func send<C, D, E>(_ payload: C, on chan: consuming Chan<(C, Chan<D, E>), Empty>) async -> Chan<E, D> {
         await chan.channel.send(payload as AnyObject)
-        return Chan<C, B>(channel: chan.channel)
+        return Chan<E, D>(channel: chan.channel)
     }
     
     /// Receives a message from the channel and returns it along with the continuation channel.
     /// - Parameter chan: The channel from which the message is received.
     /// - Returns: A tuple containing the received message and the continuation channel.
-    static func recv<A, B, C>(from chan: consuming Chan<Empty, (A, Chan<B, C>)>) async -> (A, Chan<B, C>) {
+    static func recv<C, D, E>(from chan: consuming Chan<Empty, (C, Chan<D, E>)>) async -> (C, Chan<D, E>) {
         let msg = await chan.channel.first(where: { _ in true })!
-        return (msg as! A, Chan<B, C>(channel: chan.channel))
+        return (msg as! C, Chan<D, E>(channel: chan.channel))
     }
     
     /// Closes the channel, indicating the end of communication.
     /// - Parameter channel: The channel to be closed.
     static func close(_ channel: consuming Chan<Empty, Empty>) {
+//        channel.channel.finish()
         return
     }
     
