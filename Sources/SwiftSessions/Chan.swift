@@ -57,11 +57,22 @@ final class Chan<A, B> {
     
     // MARK: - Version with closures
     
+    /// Sends a message on the channel and invokes the specified closure upon completion.
+    /// - Parameters:
+    ///   - payload: The payload to be sent on the channel.
+    ///   - chan: The channel on which the payload is sent.
+    ///   - continuation: A closure to be invoked after the send operation completes.
+    ///                    This closure receives the continuation channel for further communication.
     static func send<C, D, E>(_ payload: C, on chan: consuming Chan<(C, Chan<D, E>), Empty>, continuation: @escaping (Chan<E, D>) async -> Void) async {
         await chan.channel.send(payload as AnyObject)
         await continuation(Chan<E, D>(channel: chan.channel))
     }
     
+    /// Receives a message from the channel and invokes the specified closure upon completion.
+    /// - Parameters:
+    ///   - chan: The channel from which the message is received.
+    ///   - continuation: A closure to be invoked after the receive operation completes.
+    ///                    This closure receives the received message and the continuation channel.
     static func recv<C, D, E>(from chan: consuming Chan<Empty, (C, Chan<D, E>)>, continuation: @escaping ((C, Chan<D, E>)) async -> Void) async {
         let msg = await chan.channel.first(where: { _ in true })!
         await continuation((msg as! C, Chan<D, E>(channel: chan.channel)))

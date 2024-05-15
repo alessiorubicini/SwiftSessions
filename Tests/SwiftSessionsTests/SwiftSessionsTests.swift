@@ -4,7 +4,7 @@ import XCTest
 @testable import SwiftSessions
 
 final class SwiftSessionsTests: XCTestCase {
-    func testIsEvenWithoutGuard() async {
+    func testIsEvenWithoutClosures() async {
         typealias Session = Chan<(Int, Chan<(Bool, Chan<Empty, Empty>), Empty>), Empty>
         
         let c = await Session.create({ c in
@@ -22,10 +22,10 @@ final class SwiftSessionsTests: XCTestCase {
         assert(isEven == true)
     }
     
-    func testWithClosures() async {
+    func testIsEvenWithClosures() async {
         typealias Session = Chan<(Int, Chan<(Bool, Chan<Empty, Empty>), Empty>), Empty>
         
-        // One side of the communication
+        // One side of the communication channel
         let c = await Session.create { c in
             await Session.recv(from: c) { num, c in
                 await Session.send(num % 2 == 0, on: c) { end in
@@ -34,7 +34,7 @@ final class SwiftSessionsTests: XCTestCase {
             }
         }
         
-        // Another side of the communication
+        // Another side of the communication channel
         await Session.send(42, on: c) { c in
             await Session.recv(from: c) { isEven, c in
                 Session.close(c)
