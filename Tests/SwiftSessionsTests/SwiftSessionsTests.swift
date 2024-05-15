@@ -21,22 +21,27 @@ final class SwiftSessionsTests: XCTestCase {
         
         assert(isEven == true)
     }
-    func testIsEvenWithGuard() async {
+    
+    func testWithClosures() async {
         typealias Session = Chan<(Int, Chan<(Bool, Chan<Empty, Empty>), Empty>), Empty>
         
-        let c = await Session.create({ c in
-            let (num, c) = await Session.recv(from: c)
-            let end = await Session.send(num % 2 == 0, on: c)
-            Session.close(end)
-        })
+        // One side of the communication
+        let c = await Session.create { c in
+            await Session.recv(from: c) { num, c in
+                await Session.send(num % 2 == 0, on: c) { end in
+                    Session.close(end)
+                }
+            }
+        }
         
-        guard case let c = await Session.send(42, on: c) else {}
-        
-        guard case let (isEven, c) = await Session.recv(from: c) else {}
-        
-        Session.close(c)
-        
-        assert(isEven == true)
+        // Another side of the communication
+        await Session.send(42, on: c) { c in
+            await Session.recv(from: c) { isEven, c in
+                Session.close(c)
+                assert(isEven == true)
+            }
+        }
     }
+
 }
 
