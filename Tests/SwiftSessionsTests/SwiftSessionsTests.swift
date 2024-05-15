@@ -42,6 +42,24 @@ final class SwiftSessionsTests: XCTestCase {
             }
         }
     }
+    
+    func testIsEvenWithTypeInference() async {  
+        let c = await Chan.create { c in
+            await Chan<Any, Any>.recv(from: c) { num, c in
+                await Chan<Any, Any>.send(num % 2 == 0, on: c) { end in
+                    Chan<Any, Any>.close(end)
+                }
+            }
+        }
+        
+        // Another side of the communication channel
+        await Chan<Any, Any>.send(42, on: c) { c in
+            await Chan<Any, Any>.recv(from: c) { isEven, c in
+                Chan<Any, Any>.close(c)
+                assert(isEven == true)
+            }
+        }
+    }
 
 }
 
