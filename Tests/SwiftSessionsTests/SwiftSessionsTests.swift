@@ -4,32 +4,12 @@ import XCTest
 @testable import SwiftSessions
 
 final class SwiftSessionsTests: XCTestCase {
-    func testIsEvenWithoutClosures() async {
-        typealias Session = Chan<(Int, Chan<(Bool, Chan<Empty, Empty>), Empty>), Empty>
-        
-        let c = await Session.create({ c in
-            let (num, c) = await Session.recv(from: c)
-            let end = await Session.send(num % 2 == 0, on: c)
-            Session.close(end)
-        })
-        
-        let c1 = await Session.send(42, on: c)
-        
-        let (isEven, c2) = await Session.recv(from: c1)
-        
-        Session.close(c2)
-        
-        assert(isEven == true)
-    }
-    
-    func testIsEvenWithClosures() async {
-        typealias Session = Chan<(Int, Chan<(Bool, Chan<Empty, Empty>), Empty>), Empty>
-        
+    func testIsEven() async {
         // One side of the communication channel
         let c = await Session.create { c in
             await Session.recv(from: c) { num, c in
-                await Session.send(num % 2 == 0, on: c) { end in
-                    Session.close(end)
+                await Session.send(num % 2 == 0, on: c) { c in
+                    Session.close(c)
                 }
             }
         }
@@ -42,24 +22,4 @@ final class SwiftSessionsTests: XCTestCase {
             }
         }
     }
-    
-    func testIsEvenWithTypeInference() async {  
-        let c = await Chan.create { c in
-            await Chan<Any, Any>.recv(from: c) { num, c in
-                await Chan<Any, Any>.send(num % 2 == 0, on: c) { end in
-                    Chan<Any, Any>.close(end)
-                }
-            }
-        }
-        
-        // Another side of the communication channel
-        await Chan<Any, Any>.send(42, on: c) { c in
-            await Chan<Any, Any>.recv(from: c) { isEven, c in
-                Chan<Any, Any>.close(c)
-                assert(isEven == true)
-            }
-        }
-    }
-
 }
-
