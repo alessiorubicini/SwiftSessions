@@ -11,9 +11,3 @@ import Foundation
 enum Empty {
     
 }
-
-class Container<A> {
-    static func foo<A>(item: A) {
-        print(item)
-    }
-}
