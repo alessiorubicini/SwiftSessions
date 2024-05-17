@@ -37,6 +37,7 @@ final class SwiftSessionsTests: XCTestCase {
                             }
                         }
                     }
+                    break
                 case "fact":
                     await Session.recv(from: c) { num, c in
                         var result = 1
@@ -47,6 +48,7 @@ final class SwiftSessionsTests: XCTestCase {
 //                            Session.close(c)
 //                        }
                     }
+                    break
                 default:
                     break
                 }

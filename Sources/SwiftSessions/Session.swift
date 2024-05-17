@@ -47,7 +47,7 @@ class Session {
     /// Closes the channel, indicating the end of communication.
     /// - Parameter channel: The channel to be closed.
     static func close(_ channel: consuming Channel<Empty, Empty>) {
-        return
+        channel.close()
     }
     
     /// Sends a label on the channel to select a specific served branch and invokes the specified closure upon completion.

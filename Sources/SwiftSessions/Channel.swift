@@ -27,5 +27,7 @@ final class Channel<A, B> {
         return await asyncChannel.first(where: { _ in true })!
     }
     
-    
+    public func close() {
+        asyncChannel.finish()
+    }
 }
