@@ -26,7 +26,7 @@ final class SwiftSessionsTests: XCTestCase {
     func testSumAndFactorialWithBranching() async {
         // One side of the communication channel
         let c = await Session.create { c in
-            await Session.branch(from: c) { label, c in
+            await Session.offer(from: c) { label, c in
                 switch label {
                 case "sum":
                     await Session.recv(from: c) { (num1: Int, c) in
@@ -44,6 +44,7 @@ final class SwiftSessionsTests: XCTestCase {
                         for i in 1...num {
                             result *= i
                         }
+                        // Commented out because of type inference error
 //                        await Session.send(result, on: c) { c in
 //                            Session.close(c)
 //                        }
@@ -56,7 +57,7 @@ final class SwiftSessionsTests: XCTestCase {
         }
         
         // Another side of the communication channel
-        await Session.select(label: "sum", on: c) { c in
+        await Session.choose("sum", on: c) { c in
             await Session.send(2, on: c) { c in
                 await Session.send(3, on: c) { c in
                     await Session.recv(from: c) { result, c in

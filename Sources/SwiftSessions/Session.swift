@@ -50,23 +50,23 @@ class Session {
         channel.close()
     }
     
-    /// Sends a label on the channel to select a specific served branch and invokes the specified closure upon completion.
+    /// Sends a label on the channel to communicate the choice a specific protocol's branch and invokes the given closure upon completion.
     /// - Parameters:
     ///  - label: The label to be sent on the channel.
     ///  - chan: The channel on which the label is sent.
     ///  - continuation: A closure to be invoked after the send operation completes.
     ///          This closure receives the continuation channel for further communication.
-    static func select<A, B>(label: String, on channel: Channel<(String, Channel<A, B>), Empty>, continuation: @escaping (Channel<B, A>) async -> Void) async {
+    static func choose<A, B>(_ label: String, on channel: Channel<(String, Channel<A, B>), Empty>, continuation: @escaping (Channel<B, A>) async -> Void) async {
         await channel.send((label as AnyObject))
         await continuation(Channel<B, A>(channel: channel.asyncChannel))
     }
     
-    /// Receives a label for selection of a specific served branch from the channel and invokes the specified closure upon completion.
+    /// Receives a label from the channel that indicates the choice of a specific protocol's branch and invokes the given closure upon completion.
     /// - Parameters:
-    ///  - chan: The channel from which the label is received.
+    ///  - chan: The channel from which the choice label is received.
     ///  - continuation: A closure to be invoked after the receive operation completes.
     ///          This closure receives the received label and the continuation channel.
-    static func branch<B, C>(from channel: Channel<Empty, (String, Channel<B, C>)>, continuation: @escaping ((String, Channel<B, C>)) async -> Void) async {
+    static func offer<B, C>(from channel: Channel<Empty, (String, Channel<B, C>)>, continuation: @escaping ((String, Channel<B, C>)) async -> Void) async {
         let msg = await channel.recv()
         await continuation((msg as! String, Channel<B, C>(channel: channel.asyncChannel)))
     }
