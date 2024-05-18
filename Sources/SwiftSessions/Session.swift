@@ -8,6 +8,7 @@
 import Foundation
 import AsyncAlgorithms
 
+/// A utility class for implementing session types based communications using channels
 class Session {
     
     /// Creates a new session with two dual channels and executes the provided closure on the secondary channel

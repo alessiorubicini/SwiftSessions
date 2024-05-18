@@ -1,9 +1,16 @@
+//
+//  Channel.swift
+//
+//
+//  Created by Alessio Rubicini on 04/05/24.
+//
+
 import Foundation
 import AsyncAlgorithms
 
 /// Represents a communication channel that enforces session types
-///   - A: The type of messages that can be sent on the channel.
-///   - B: The type of messages that can be received on the channel.
+///   - `A`: The type of messages that can be sent on the channel.
+///   - `B`: The type of messages that can be received on the channel.
 final class Channel<A, B> {
     
     /// Underlying asynchronous channel for communication.
@@ -27,6 +34,8 @@ final class Channel<A, B> {
         return await asyncChannel.first(where: { _ in true })!
     }
     
+    /// Resumes all the operations on the underlying asynchronous channel
+    /// and ends the communication
     public func close() {
         asyncChannel.finish()
     }
