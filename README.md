@@ -22,7 +22,6 @@ let c = await Session.create { c in
 await Session.send(42, on: c) { c in
     await Session.recv(from: c) { isEven, c in
         Session.close(c)
-        assert(isEven == true)
     }
 }
 ```
