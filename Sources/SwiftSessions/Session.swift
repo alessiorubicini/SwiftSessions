@@ -67,9 +67,9 @@ class Session {
     ///  - chan: The channel from which the choice label is received.
     ///  - continuation: A closure to be invoked after the receive operation completes.
     ///          This closure receives the received label and the continuation channel.
-    static func offer<B, C>(from channel: Channel<Empty, (String, Channel<B, C>)>, continuation: @escaping ((String, Channel<B, C>)) async -> Void) async {
+    static func offer<A, B>(from channel: Channel<Empty, (String, Channel<A, B>)>, continuation: @escaping ((String, Channel<A, B>)) async -> Void) async {
         let msg = await channel.recv()
-        await continuation((msg as! String, Channel<B, C>(channel: channel.asyncChannel)))
+        await continuation((msg as! String, Channel<A, B>(channel: channel.asyncChannel)))
     }
     
 }
