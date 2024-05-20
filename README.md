@@ -30,7 +30,7 @@ For additional examples, see [Tests/SwiftSessionsTests](Tests/SwiftSessionsTests
 
 ## Installation
 
-To integrate SessionTypes-Swift into your project, use Swift Package Manager. 
+To integrate SwiftSessions into your project, use Swift Package Manager. 
 
 1. Add the following dependency to your `Package.swift` file:
 
