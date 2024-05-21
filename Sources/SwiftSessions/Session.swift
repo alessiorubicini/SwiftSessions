@@ -118,13 +118,7 @@ class Session {
     
     static func offer<A, B, C, D>(_ channel: Channel<Empty, Or<Channel<A, B>, Channel<C, D>>>) async -> Or<Channel<A, B>, Channel<C, D>> {
         let branch = await channel.recv() as! Or<Channel<A, B>, Channel<C, D>>
-        
-        switch branch {
-        case .left(let c):
-            return .left(Channel<A, B>(channel: channel.asyncChannel))
-        case .right(let c):
-            return .right(Channel<C, D>(channel: channel.asyncChannel))
-        }
+        return branch
     }
     
     static func left<A, B, C, D>(_ channel: Channel<Or<Channel<A, B>, Channel<C, D>>, Empty>) -> Channel<B, A> {
