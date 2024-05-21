@@ -58,6 +58,7 @@ class Session {
         }
     }
     
+    
     // MARK: - Version with closures
     
     /// Sends a message on the channel and invokes the specified closure upon completion.
@@ -83,13 +84,7 @@ class Session {
     
     static func offer<A, B, C, D>(_ channel: Channel<Empty, Or<Channel<A, B>, Channel<C, D>>>, continuation: @escaping (Or<Channel<A, B>, Channel<C, D>>) async -> Void) async {
         let branch = await channel.recv() as! Or<Channel<A, B>, Channel<C, D>>
-    
-        switch branch {
-        case .left(let c):
-            await continuation(.left(Channel<A, B>(channel: channel.asyncChannel)))
-        case .right(let c):
-            await continuation(.right(Channel<C, D>(channel: channel.asyncChannel)))
-        }
+        await continuation(branch)
     }
     
     static func left<A, B, C, D>(_ channel: Channel<Or<Channel<A, B>, Channel<C, D>>, Empty>, continuation: @escaping (Channel<B, A>) async -> Void) async {
