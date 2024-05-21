@@ -81,6 +81,25 @@ class Session {
         await continuation((msg as! A, Channel<B, C>(channel: channel.asyncChannel)))
     }
     
+    static func offer<A, B, C, D>(_ channel: Channel<Empty, Or<Channel<A, B>, Channel<C, D>>>, continuation: @escaping (Or<Channel<A, B>, Channel<C, D>>) async -> Void) async {
+        let branch = await channel.recv() as! Or<Channel<A, B>, Channel<C, D>>
+    
+        switch branch {
+        case .left(let c):
+            await continuation(.left(Channel<A, B>(channel: channel.asyncChannel)))
+        case .right(let c):
+            await continuation(.right(Channel<C, D>(channel: channel.asyncChannel)))
+        }
+    }
+    
+    static func left<A, B, C, D>(_ channel: Channel<Or<Channel<A, B>, Channel<C, D>>, Empty>, continuation: @escaping (Channel<B, A>) async -> Void) async {
+        await continuation(Channel<B, A>(channel: channel.asyncChannel))
+    }
+    
+    static func right<A, B, C, D>(_ channel: Channel<Or<Channel<A, B>, Channel<C, D>>, Empty>, continuation: @escaping (Channel<D, C>) async -> Void) async {
+        await continuation(Channel<D, C>(channel: channel.asyncChannel))
+    }
+    
     
     // MARK: - Version with channel passing
     
@@ -102,7 +121,27 @@ class Session {
         return (msg as! C, Channel<D, E>(channel: chan.asyncChannel))
     }
     
-    // MARK: - Closing
+    static func offer<A, B, C, D>(_ channel: Channel<Empty, Or<Channel<A, B>, Channel<C, D>>>) async -> Or<Channel<A, B>, Channel<C, D>> {
+        let branch = await channel.recv() as! Or<Channel<A, B>, Channel<C, D>>
+        
+        switch branch {
+        case .left(let c):
+            return .left(Channel<A, B>(channel: channel.asyncChannel))
+        case .right(let c):
+            return .right(Channel<C, D>(channel: channel.asyncChannel))
+        }
+    }
+    
+    static func left<A, B, C, D>(_ channel: Channel<Or<Channel<A, B>, Channel<C, D>>, Empty>) -> Channel<B, A> {
+        return Channel<B, A>(channel: channel.asyncChannel)
+    }
+    
+    static func right<A, B, C, D>(_ channel: Channel<Or<Channel<A, B>, Channel<C, D>>, Empty>) -> Channel<D, C> {
+        return Channel<D, C>(channel: channel.asyncChannel)
+    }
+    
+    
+    // MARK: - Channel closing
     
     /// Closes the channel, indicating the end of communication.
     /// - Parameter channel: The channel to be closed.
