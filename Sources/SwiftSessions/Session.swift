@@ -82,9 +82,17 @@ class Session {
         await continuation((msg as! A, Channel<B, C>(channel: channel.asyncChannel)))
     }
     
-    static func offer<A, B, C, D>(_ channel: Channel<Empty, Or<Channel<A, B>, Channel<C, D>>>, continuation: @escaping (Or<Channel<A, B>, Channel<C, D>>) async -> Void) async {
-        let branch = await channel.recv() as! Or<Channel<A, B>, Channel<C, D>>
-        await continuation(branch)
+    static func offer<A, B, C, D>(on channel: Channel<Empty, Or<Channel<A, B>, Channel<C, D>>>, side1: @escaping (Channel<A, B>) async -> Void, side2: @escaping (Channel<C, D>) async -> Void) async {
+        
+        // CAST FAILS
+        let selectedBranch = await channel.recv() as! Or<Channel<A, B>, Channel<C, D>>
+        
+        switch selectedBranch {
+        case .left(let c):
+            await side1(c)
+        case .right(let c):
+            await side2(c)
+        }
     }
     
     static func left<A, B, C, D>(_ channel: Channel<Or<Channel<A, B>, Channel<C, D>>, Empty>, continuation: @escaping (Channel<B, A>) async -> Void) async {
@@ -117,8 +125,8 @@ class Session {
     }
     
     static func offer<A, B, C, D>(_ channel: Channel<Empty, Or<Channel<A, B>, Channel<C, D>>>) async -> Or<Channel<A, B>, Channel<C, D>> {
-        let branch = await channel.recv() as! Or<Channel<A, B>, Channel<C, D>>
-        return branch
+        let selectedBranch = await channel.recv() as! Or<Channel<A, B>, Channel<C, D>>
+        return selectedBranch
     }
     
     static func left<A, B, C, D>(_ channel: Channel<Or<Channel<A, B>, Channel<C, D>>, Empty>) -> Channel<B, A> {

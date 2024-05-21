@@ -25,27 +25,23 @@ final class SwiftSessionsTests: XCTestCase {
     
     func testSumAndFactorialWithBranching() async {
         let c = await Session.create { c in
-            await Session.offer(c) { c in
-                switch(c) {
-                case .left(c):
-                    await Session.recv(from: c) { (num1, c) in
-                        await Session.recv(from: c) { (num2, c) in
-                            let sum = num1 + num2
-                            await Session.send(sum, on: c) { c in
-                                Session.close(c)
-                            }
-                        }
-                    }
-                    
-                case .right(c):
-                    await Session.recv(from: c) { num, c in
-                        var result = 1
-                        for i in 1...num {
-                            result *= i
-                        }
-                        await Session.send(result, on: c) { c in
+            await Session.offer(on: c) { c in
+                await Session.recv(from: c) { (num1: Int, c) in
+                    await Session.recv(from: c) { (num2: Int, c) in
+                        let sum = num1 + num2
+                        await Session.send(sum, on: c) { c in
                             Session.close(c)
                         }
+                    }
+                }
+            } side2: { c in
+                await Session.recv(from: c) { num, c in
+                    var result = 1
+                    for i in 1...num {
+                        result *= i
+                    }
+                    await Session.send(result, on: c) { c in
+                        Session.close(c)
                     }
                 }
             }
