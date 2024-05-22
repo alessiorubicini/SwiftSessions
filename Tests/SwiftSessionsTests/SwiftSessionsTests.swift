@@ -23,7 +23,7 @@ final class SwiftSessionsTests: XCTestCase {
         }
     }
     
-    func testSumAndFactorialWithBranching() async {
+    func testSumWithBranching() async {
         let c = await Session.create { c in
             await Session.offer(on: c) { c in
                 await Session.recv(from: c) { (num1: Int, c) in
@@ -55,6 +55,42 @@ final class SwiftSessionsTests: XCTestCase {
                         Session.close(c)
                         assert(result == 5)
                     }
+                }
+            }
+        }
+        
+    }
+    
+    func testFactorialWithBranching() async {
+        let c = await Session.create { c in
+            await Session.offer(on: c) { c in
+                await Session.recv(from: c) { (num1: Int, c) in
+                    await Session.recv(from: c) { (num2: Int, c) in
+                        let sum = num1 + num2
+                        await Session.send(sum, on: c) { c in
+                            Session.close(c)
+                        }
+                    }
+                }
+            } or: { c in
+                await Session.recv(from: c) { num, c in
+                    var result = 1
+                    for i in 1...num {
+                        result *= i
+                    }
+                    await Session.send(result, on: c) { c in
+                        Session.close(c)
+                    }
+                }
+            }
+
+        }
+        
+        await Session.right(c) { c in
+            await Session.send(3, on: c) { c in
+                await Session.recv(from: c) { result, c in
+                    Session.close(c)
+                    assert(result == 6)
                 }
             }
         }
