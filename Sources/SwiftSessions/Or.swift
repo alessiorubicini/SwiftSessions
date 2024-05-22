@@ -7,7 +7,7 @@
 
 import Foundation
 
-/// Represents a binary branching point with two possible choices
+/// Represents a binary branching point with two possible protocol choices
 enum Or<A, B> {
     case left(A)
     case right(B)

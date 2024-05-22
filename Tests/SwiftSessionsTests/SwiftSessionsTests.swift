@@ -34,7 +34,7 @@ final class SwiftSessionsTests: XCTestCase {
                         }
                     }
                 }
-            } side2: { c in
+            } or: { c in
                 await Session.recv(from: c) { num, c in
                     var result = 1
                     for i in 1...num {
