@@ -13,6 +13,7 @@ import XCTest
 final class BranchingTests: XCTestCase {
 
     func testSumWithBranching() async {
+        // One side of the communication channel
         let c = await Session.create { c in
             await Session.offer(on: c) { c in
                 await Session.recv(from: c) { num1, c in
@@ -37,6 +38,7 @@ final class BranchingTests: XCTestCase {
 
         }
         
+        // Another side of the communication channel
         await Session.left(c) { c in
             await Session.send(2, on: c) { c in
                 await Session.send(3, on: c) { c in
@@ -51,6 +53,7 @@ final class BranchingTests: XCTestCase {
     }
     
     func testFactorialWithBranching() async {
+        // One side of the communication channel
         let c = await Session.create { c in
             await Session.offer(on: c) { c in
                 await Session.recv(from: c) { num1, c in
@@ -75,6 +78,7 @@ final class BranchingTests: XCTestCase {
 
         }
         
+        // Another side of the communication channel
         await Session.right(c) { c in
             await Session.send(3, on: c) { c in
                 await Session.recv(from: c) { result, c in
