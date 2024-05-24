@@ -20,7 +20,6 @@ This library offers two distinct styles for managing session types in Swift:
         await Session.send(42, on: c) { c in
             await Session.recv(from: c) { isEven, c in
                 Session.close(c)
-                assert(isEven == true)
             }
         }   
     }
@@ -44,8 +43,6 @@ This library offers two distinct styles for managing session types in Swift:
     let c1 = await Session.send(42, on: c)
     let (isEven, c2) = await Session.recv(from: c1)
     Session.close(c2)
-
-    assert(isEven == true)
     ```
     
     The main pro of this style is code simplicity since it doesn't require indenting more and more every time a primitive is called, while the main con is missing support to complete type inference.
