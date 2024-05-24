@@ -11,26 +11,7 @@ import XCTest
 @testable import SwiftSessions
 
 final class StandardTests: XCTestCase {
-    func testIsEvenWithCreate1() async {
-        // One side of the communication channel
-        let c = await Session.create { c in
-            await Session.recv(from: c) { num, c in
-                await Session.send(num % 2 == 0, on: c) { c in
-                    Session.close(c)
-                }
-            }
-        }
-        
-        // Another side of the communication channel
-        await Session.send(42, on: c) { c in
-            await Session.recv(from: c) { isEven, c in
-                Session.close(c)
-                assert(isEven == true)
-            }
-        }
-    }
-    
-    func testIsEvenWithCreate2() async {
+    func testIsEvenWithClosures() async {
         await Session.create { c in
             // One side of the communication channel
             await Session.recv(from: c) { num, c in
