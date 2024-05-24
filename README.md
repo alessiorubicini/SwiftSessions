@@ -34,9 +34,9 @@ This library offers two distinct styles for managing session types in Swift:
         
     // One side of the communication channel
     let c = await Session.create { (c: Communication) in
-    let (num, c1) = await Session.recv(from: c)
-    let c2 = await Session.send(num % 2 == 0, on: c1)
-    Session.close(c2)
+        let (num, c1) = await Session.recv(from: c)
+        let c2 = await Session.send(num % 2 == 0, on: c1)
+        Session.close(c2)
     }
 
     // Another side of the communication channel
