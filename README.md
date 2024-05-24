@@ -8,20 +8,21 @@ This library offers two distinct styles for managing session types in Swift:
 - **Continuation with Closures**: closures are used to handle the next steps after sending or receiving a message. This approach makes the flow of logic explicit and easy to follow within the closure context. It's particularly useful for straightforward communication sequences. 
     
     ```swift
-    // One side of the communication channel
-    let c = await Session.create { c in
+    await Session.create { c in
+        // One side of the communication channel
         await Session.recv(from: c) { num, c in
             await Session.send(num % 2 == 0, on: c) { c in
                 Session.close(c)
             }
         }
-    }
-
-    // Another side of the communication channel
-    await Session.send(42, on: c) { c in
-        await Session.recv(from: c) { isEven, c in
-            Session.close(c)
-        }
+    } _: { c in
+        // Another side of the communication channel
+        await Session.send(42, on: c) { c in
+            await Session.recv(from: c) { isEven, c in
+                Session.close(c)
+                assert(isEven == true)
+            }
+        }   
     }
     ```
     
