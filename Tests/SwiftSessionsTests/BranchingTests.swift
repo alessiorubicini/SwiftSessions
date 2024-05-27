@@ -49,7 +49,6 @@ final class BranchingTests: XCTestCase {
                 }
             }
         }
-        
     }
     
     func testFactorialWithBranching() async {

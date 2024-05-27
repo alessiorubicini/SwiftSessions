@@ -20,8 +20,8 @@ extension Session {
     ///   - continuation: A closure to be invoked after the send operation completes.
     ///                    This closure receives the continuation channel for further communication.
     static func send<A, B, C>(_ payload: A, on channel: Channel<(A, Channel<B, C>), Empty>, continuation: @escaping (Channel<C, B>) async -> Void) async {
-        await channel.send(payload as AnyObject)
-        await continuation(Channel<C, B>(channel: channel.asyncChannel))
+        await channel.send(payload as Sendable)
+        await continuation(Channel<C, B>(from: channel))
     }
     
     /// Receives a message from the channel and invokes the specified closure upon completion.
@@ -31,7 +31,7 @@ extension Session {
     ///                    This closure receives the received message and the continuation channel.
     static func recv<A, B, C>(from channel: Channel<Empty, (A, Channel<B, C>)>, continuation: @escaping ((A, Channel<B, C>)) async -> Void) async {
         let msg = await channel.recv()
-        await continuation((msg as! A, Channel<B, C>(channel: channel.asyncChannel)))
+        await continuation((msg as! A, Channel<B, C>(from: channel)))
     }
     
     /// Offers a choice between two branches on the given channel, and executes the corresponding closure based on the selected branch.
@@ -43,9 +43,9 @@ extension Session {
         let bool = await channel.recv() as! Bool
         
         if bool {
-            await side1(Channel<A, B>(channel: channel.asyncChannel))
+            await side1(Channel<A, B>(from: channel))
         } else {
-            await side2(Channel<C, D>(channel: channel.asyncChannel))
+            await side2(Channel<C, D>(from: channel))
         }
     }
     
@@ -54,8 +54,8 @@ extension Session {
     ///   - channel: The channel on which the left branch is selected. This channel sends a value indicating the left branch selection (`true`).
     ///   - continuation: A closure to be executed after the left branch is selected. This closure receives a channel of type `Channel<B, A>`.
     static func left<A, B, C, D>(_ channel: Channel<Or<Channel<A, B>, Channel<C, D>>, Empty>, continuation: @escaping (Channel<B, A>) async -> Void) async {
-        await channel.send(true as AnyObject)
-        await continuation(Channel<B, A>(channel: channel.asyncChannel))
+        await channel.send(true as Sendable)
+        await continuation(Channel<B, A>(from: channel))
     }
     
     /// Selects the right branch on the given channel and executes the provided continuation closure.
@@ -63,8 +63,8 @@ extension Session {
     ///   - channel: The channel on which the right branch is selected. This channel sends a value indicating the right branch selection (`false`).
     ///   - continuation: A closure to be executed after the right branch is selected. This closure receives a channel of type `Channel<D, C>`.
     static func right<A, B, C, D>(_ channel: Channel<Or<Channel<A, B>, Channel<C, D>>, Empty>, continuation: @escaping (Channel<D, C>) async -> Void) async {
-        await channel.send(false as AnyObject)
-        await continuation(Channel<D, C>(channel: channel.asyncChannel))
+        await channel.send(false as Sendable)
+        await continuation(Channel<D, C>(from: channel))
     }
     
 }

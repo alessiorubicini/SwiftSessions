@@ -15,7 +15,7 @@ class Session {
     /// - Parameter closure: The closure to be executed on the secondary channel of type `Chan<B, A>`
     /// - Returns: The primary channel of type `Chan<A, B>`
     static func create<A, B>(_ closure: @escaping (_: Channel<B, A>) async -> Void) async -> Channel<A, B> {
-        let channel: AsyncChannel<AnyObject> = AsyncChannel()
+        let channel: AsyncChannel<Sendable> = AsyncChannel()
         let c1 = Channel<A, B>(channel: channel)
         let c2 = Channel<B, A>(channel: channel)
         Task {
@@ -31,7 +31,7 @@ class Session {
     ///
     /// - Returns: A tuple containing two channels: the first of type `Channel<A, B>` and the second of type `Channel<B, A>`.
     static func create<A, B>() -> (Channel<A, B>, Channel<B, A>) {
-        let channel: AsyncChannel<AnyObject> = AsyncChannel()
+        let channel: AsyncChannel<Sendable> = AsyncChannel()
         let c1 = Channel<A, B>(channel: channel)
         let c2 = Channel<B, A>(channel: channel)
         return (c1, c2)
@@ -47,7 +47,7 @@ class Session {
     ///   - sideOne: The closure to be executed on the secondary channel of type `Channel<B, A>`.
     ///   - sideTwo: The closure to be executed on the primary channel of type `Channel<A, B>`.
     static func create<A, B>(_ sideOne: @escaping (_: Channel<B, A>) async -> Void, _ sideTwo: @escaping (_: Channel<A, B>) async -> Void) async {
-        let channel: AsyncChannel<AnyObject> = AsyncChannel()
+        let channel: AsyncChannel<Sendable> = AsyncChannel()
         let channel1 = Channel<A, B>(channel: channel)
         let channel2 = Channel<B, A>(channel: channel)
         Task {
