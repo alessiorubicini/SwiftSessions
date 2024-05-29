@@ -8,18 +8,21 @@
 import Foundation
 import AsyncAlgorithms
 
+/// Represents a server that can create and handle client sessions.
 class Server<A, B> {
+    
+    /// The public channel for receiving session requests from clients.
     let channel: AsyncChannel<Sendable>
     
+    /// Initializes a new server instance that listens for client sessions.
+    ///
+    /// - Parameter closure: The closure to execute on the server's channel for each session.
     init(_ closure: @escaping (_: Channel<A, B>) async -> Void) async {
-        // Creates a public channel to receive sessions request
         channel = AsyncChannel()
-        // Waits and listen for session requests
         Task {
             while true {
                 for await message in channel {
                     let channel = message as! Channel<A, B>
-                    // Runs the server protocol on the received channel
                     Task {
                         await closure(channel)
                     }

@@ -8,16 +8,19 @@
 import Foundation
 import AsyncAlgorithms
 
+/// Represents a client that can establish a session with a server.
 class Client {
+    
+    /// Initializes a new client session for the given server.
+    ///
+    /// - Parameters:
+    ///   - server: The server instance to connect to.
+    ///   - closure: The closure to execute on the client's channel after connecting.
     init<A, B>(for server: Server<A, B>, _ closure: @escaping (_: Channel<B, A>) async -> Void) async {
-        // Creates private async channel for the session
         let channel: AsyncChannel<Sendable> = AsyncChannel()
-        // Creates the two dual channels
         let c1 = Channel<A, B>(channel: channel)
         let c2 = Channel<B, A>(channel: channel)
-        // Sends the first channel to the server
         await server.channel.send(c1)
-        // Runs the client protocol on the second channel
         Task {
             await closure(c2)
         }
