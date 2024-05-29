@@ -56,7 +56,7 @@ This library offers two distinct styles for managing session types:
 
 While the library can be used in a straightforward and concise manner, creating disposable sessions as seen in the previous examples, it also supports a client/server architectural style.
 
-A **server** is responsible for creating and managing multiple sessions according to a specific behavior or protocol. Many **clients** can be spawned and used with the same server to interact dually with its well-defined protocol. This allows to define a protocol's side only once, and use it as many times as we want.
+A **server** is responsible for creating and managing multiple sessions that can handle a specific behavior or protocol. Many **clients** can be spawned and used with the same server to interact dually according to that defined behavior. This allows to define a protocol's side only once, and use it as many times as we want.
 
 ```swift
 // Server side
@@ -75,7 +75,7 @@ let c1 = await Client(for: server) { c in
             Session.close(c)
         }
     }
-    }
+}
 
 // You can spawn more clients here...
 ```
