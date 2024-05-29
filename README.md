@@ -4,7 +4,8 @@
 
 ## Overview
 
-This library offers two distinct styles for managing session types in Swift:
+### Programming Styles
+This library offers two distinct styles for managing session types:
 - **Continuation with Closures**: closures are used to handle the next steps after sending or receiving a message. This approach makes the flow of logic explicit and easy to follow within the closure context. It's particularly useful for straightforward communication sequences. 
     
     ```swift
@@ -47,9 +48,39 @@ This library offers two distinct styles for managing session types in Swift:
     
     The main pro of this style is code simplicity since it doesn't require indenting more and more every time a primitive is called, while the main con is missing support to complete type inference.
 
- Each style provides a unique approach to handling session-based binary communication, and comes with its own pros and cons. By supporting both styles, SwiftSessions allows you to choose the approach that best fits your needs and your coding preferences.
+ Each style provides a unique approach to handling session-based binary communication, and comes with its own pros and cons. By supporting both styles, SwiftSessions allows you to choose the best approach (or both of them in a hybrid way!) according to your needs and coding preferences.
+ 
+ For additional examples, see [Tests/SwiftSessionsTests](Tests/SwiftSessionsTests).
+ 
+### Client/Server Architecture
 
-For additional examples, see [Tests/SwiftSessionsTests](Tests/SwiftSessionsTests)
+While the library can be used in a straightforward and concise manner, creating disposable sessions as seen in the previous examples, it also supports a client/server architectural style.
+
+A **server** is responsible for creating and managing multiple sessions according to a specific behavior or protocol. Many **clients** can be spawned and used with the same server to interact dually with its well-defined protocol. This allows to define a protocol's side only once, and use it as many times as we want.
+
+```swift
+// Server side
+let server = await Server { c in
+    await Session.recv(from: c) { num, c in
+        await Session.send(num % 2 == 0, on: c) { c in
+            Session.close(c)
+        }
+    }
+}
+
+// Client side
+let c1 = await Client(for: server) { c in
+    await Session.send(42, on: c) { c in
+        await Session.recv(from: c) { isEven, c in
+            Session.close(c)
+        }
+    }
+    }
+
+// You can spawn more clients here...
+```
+    
+This architecture is useful for scenarios where multiple clients need to interact with a single server. It's also useful to implement complex protocols that involve loops and recursion.
 
 ## Installation
 
