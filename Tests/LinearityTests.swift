@@ -29,6 +29,7 @@ final class LinearityTests: XCTestCase {
             await Session.send(42, on: c) { c1 in
                 await Session.recv(from: c1) { isEven, c2 in
                     Session.close(c2)
+                    assert(isEven == true)
                 }
             }
         }

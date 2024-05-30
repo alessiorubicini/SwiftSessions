@@ -52,6 +52,8 @@ class Session {
         let channel2 = Channel<B, A>(channel: channel)
         Task {
             await sideOne(channel2)
+        }
+        Task {
             await sideTwo(channel1)
         }
     }
