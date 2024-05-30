@@ -21,14 +21,14 @@ final class LinearityTests: XCTestCase {
                 await Session.send(num % 2 == 0, on: c1) { c2 in
                     // Using channel c1 again
                     await Session.send(false, on: c1) { c3 in
-                        Session.close(c2)
+                        await Session.close(c2)
                     }
                 }
             }
         } _: { c in
             await Session.send(42, on: c) { c1 in
                 await Session.recv(from: c1) { isEven, c2 in
-                    Session.close(c2)
+                    await Session.close(c2)
                     assert(isEven == true)
                 }
             }
@@ -41,7 +41,7 @@ final class LinearityTests: XCTestCase {
         await Session.create { c in
             await Session.recv(from: c) { num, c1 in
                 await Session.send(num % 2 == 0, on: c1) { c2 in
-                    Session.close(c2)
+                    await Session.close(c2)
                 }
             }
         } _: { c in

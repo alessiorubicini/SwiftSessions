@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  Session+Closures.swift
 //  
 //
 //  Created by Alessio Rubicini on 22/05/24.

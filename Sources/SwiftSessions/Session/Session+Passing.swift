@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  Session+Passing.swift
 //  
 //
 //  Created by Alessio Rubicini on 22/05/24.

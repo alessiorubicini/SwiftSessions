@@ -60,8 +60,8 @@ class Session {
     
     /// Closes the channel, indicating the end of communication.
     /// - Parameter channel: The channel to be closed.
-    static func close(_ channel: Channel<Empty, Empty>) {
-        channel.close()
+    static func close(_ channel: Channel<Empty, Empty>) async {
+        await channel.close()
     }
     
 }

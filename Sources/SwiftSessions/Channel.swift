@@ -11,12 +11,12 @@ import AsyncAlgorithms
 /// Represents a communication channel that enforces session types
 ///   - `A`: The type of messages that can be sent on the channel.
 ///   - `B`: The type of messages that can be received on the channel.
-final class Channel<A, B>: Sendable {
+actor Channel<A, B> {
     
     /// Underlying asynchronous channel for communication.
     let asyncChannel: AsyncChannel<Sendable>
     
-//    var isUsed: Bool = false
+    var isUsed: Bool = false
     
     /// Initializes a new channel with the given asynchronous channel.
     /// - Parameter channel: The underlying asynchronous channel for communication.
@@ -31,22 +31,22 @@ final class Channel<A, B>: Sendable {
     /// Sends the given element on the async channel
     /// - Parameter element: the element to be sent
     public func send(_ element: Sendable) async {
-//        guard !isUsed else {
-//            close()
-//            fatalError("Cannot send: channel already used")
-//        }
-//        isUsed = true
+        guard !isUsed else {
+            close()
+            fatalError("Cannot send. Channel already used.")
+        }
+        isUsed = true
         await asyncChannel.send(element)
     }
     
     /// Receives an element from the async channel
     /// - Returns: the element received
     public func recv() async -> Sendable {
-//        guard !isUsed else {
-//            close()
-//            fatalError("Cannot recv: channel already used")
-//        }
-//        isUsed = true
+        guard !isUsed else {
+            close()
+            fatalError("Cannot recv. Channel already used.")
+        }
+        isUsed = true
         return await asyncChannel.first(where: { _ in true })!
     }
     
