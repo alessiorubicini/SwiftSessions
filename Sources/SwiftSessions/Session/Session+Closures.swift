@@ -20,7 +20,7 @@ extension Session {
     ///   - continuation: A closure to be invoked after the send operation completes.
     ///                    This closure receives the continuation channel for further communication.
     static func send<A, B, C>(_ payload: A, on channel: Channel<(A, Channel<B, C>), Empty>, continuation: @escaping (Channel<C, B>) async -> Void) async {
-        await channel.send(payload as Sendable)
+        await channel.send(payload)
         await continuation(Channel<C, B>(from: channel))
     }
     

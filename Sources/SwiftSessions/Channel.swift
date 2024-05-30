@@ -43,4 +43,5 @@ final class Channel<A, B>: Sendable {
     public func close() {
         asyncChannel.finish()
     }
+    
 }

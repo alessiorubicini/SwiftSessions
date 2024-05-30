@@ -50,7 +50,7 @@ This library offers two distinct styles for managing session types:
 
  Each style provides a unique approach to handling session-based binary communication, and comes with its own pros and cons. By supporting both styles, SwiftSessions allows you to choose the best approach (or both of them in a hybrid way!) according to your needs and coding preferences.
  
- For additional examples, see [Tests/SwiftSessionsTests](Tests/SwiftSessionsTests).
+ For additional examples, see the [Tests](Tests) folder.
  
 ### Client/Server Architecture
 

@@ -11,6 +11,9 @@ import XCTest
 @testable import SwiftSessions
 
 final class StandardTests: XCTestCase {
+    
+    /// This test verifies the library behavior with a standard communication between two processess
+    /// using the closure continuation-passing coding style
     func testIsEvenWithClosures() async {
         await Session.create { c in
             // One side of the communication channel
@@ -30,6 +33,8 @@ final class StandardTests: XCTestCase {
         }
     }
     
+    /// This test verifies the library behavior with a standard communication between two processess
+    /// using the channel passing coding style
     func testIsEvenWithPassing() async {
         typealias Communication = Channel<Empty, (Int, Channel<(Bool, Channel<Empty, Empty>), Empty>)>
         
@@ -48,6 +53,8 @@ final class StandardTests: XCTestCase {
         assert(isEven == true)
     }
     
+    /// This test verifies the library behavior with a standard communication between two processess
+    /// using the client/server architecture style
     func testIsEvenWithClientServer() async {
         // Server side
         let s = await Server { c in
