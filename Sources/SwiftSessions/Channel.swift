@@ -8,7 +8,7 @@
 import Foundation
 import AsyncAlgorithms
 
-/// Represents a communication channel that enforces session types
+/// Represents a communication channel that enforces session types.
 ///   - `A`: The type of messages that can be sent on the channel.
 ///   - `B`: The type of messages that can be received on the channel.
 public actor Channel<A, B> {

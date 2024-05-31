@@ -12,7 +12,6 @@ import AsyncAlgorithms
 public class Client {
     
     /// Initializes a new client session for the given server.
-    ///
     /// - Parameters:
     ///   - server: The server instance to connect to.
     ///   - closure: The closure to execute on the client's channel after connecting.

@@ -15,7 +15,6 @@ public class Server<A, B> {
     let publicChannel: AsyncChannel<Sendable>
     
     /// Initializes a new server instance that listens for client sessions.
-    ///
     /// - Parameter closure: The closure to execute on the server's channel for each session.
     init(_ closure: @escaping (_: Channel<A, B>) async -> Void) async {
         publicChannel = AsyncChannel()
