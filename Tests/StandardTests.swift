@@ -74,5 +74,15 @@ final class StandardTests: XCTestCase {
                 }
             }
         }
+        
+        // Another client
+        let _ = await Client(for: s) { c in
+            await Session.send(3, on: c) { c in
+                await Session.recv(from: c) { isEven, c in
+                    await Session.close(c)
+                    assert(isEven == false)
+                }
+            }
+        }
     }
 }

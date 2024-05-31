@@ -12,16 +12,16 @@ import AsyncAlgorithms
 public class Server<A, B> {
     
     /// The public channel for receiving session requests from clients.
-    let channel: AsyncChannel<Sendable>
+    let publicChannel: AsyncChannel<Sendable>
     
     /// Initializes a new server instance that listens for client sessions.
     ///
     /// - Parameter closure: The closure to execute on the server's channel for each session.
     init(_ closure: @escaping (_: Channel<A, B>) async -> Void) async {
-        channel = AsyncChannel()
+        publicChannel = AsyncChannel()
         Task {
             while true {
-                for await message in channel {
+                for await message in publicChannel {
                     let channel = message as! Channel<A, B>
                     Task {
                         await closure(channel)
@@ -29,5 +29,9 @@ public class Server<A, B> {
                 }
             }
         }
+    }
+    
+    public func connect(with channel: Channel<A, B>) async {
+        await publicChannel.send(channel)
     }
 }

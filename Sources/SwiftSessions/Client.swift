@@ -20,7 +20,7 @@ public class Client {
         let channel: AsyncChannel<Sendable> = AsyncChannel()
         let c1 = Channel<A, B>(with: channel)
         let c2 = Channel<B, A>(with: channel)
-        await server.channel.send(c1)
+        await server.connect(with: c1)
         Task {
             await closure(c2)
         }
