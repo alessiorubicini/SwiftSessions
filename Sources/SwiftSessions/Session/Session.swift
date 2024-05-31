@@ -8,7 +8,7 @@
 import Foundation
 import AsyncAlgorithms
 
-/// A utility class for implementing session types based communications using channels
+/// A utility class for implementing session-based communications using channels
 class Session {
     
     /// Creates a new session with two dual channels and executes the provided closure on the secondary channel
@@ -16,8 +16,8 @@ class Session {
     /// - Returns: The primary channel of type `Chan<A, B>`
     static func create<A, B>(_ closure: @escaping (_: Channel<B, A>) async -> Void) async -> Channel<A, B> {
         let channel: AsyncChannel<Sendable> = AsyncChannel()
-        let c1 = Channel<A, B>(channel: channel)
-        let c2 = Channel<B, A>(channel: channel)
+        let c1 = Channel<A, B>(with: channel)
+        let c2 = Channel<B, A>(with: channel)
         Task {
             await closure(c2)
         }
@@ -32,8 +32,8 @@ class Session {
     /// - Returns: A tuple containing two channels: the first of type `Channel<A, B>` and the second of type `Channel<B, A>`.
     static func create<A, B>() -> (Channel<A, B>, Channel<B, A>) {
         let channel: AsyncChannel<Sendable> = AsyncChannel()
-        let c1 = Channel<A, B>(channel: channel)
-        let c2 = Channel<B, A>(channel: channel)
+        let c1 = Channel<A, B>(with: channel)
+        let c2 = Channel<B, A>(with: channel)
         return (c1, c2)
     }
     
@@ -48,8 +48,8 @@ class Session {
     ///   - sideTwo: The closure to be executed on the primary channel of type `Channel<A, B>`.
     static func create<A, B>(_ sideOne: @escaping (_: Channel<B, A>) async -> Void, _ sideTwo: @escaping (_: Channel<A, B>) async -> Void) async {
         let channel: AsyncChannel<Sendable> = AsyncChannel()
-        let channel1 = Channel<A, B>(channel: channel)
-        let channel2 = Channel<B, A>(channel: channel)
+        let channel1 = Channel<A, B>(with: channel)
+        let channel2 = Channel<B, A>(with: channel)
         Task {
             await sideOne(channel2)
         }

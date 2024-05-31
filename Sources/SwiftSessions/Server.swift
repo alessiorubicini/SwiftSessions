@@ -9,7 +9,7 @@ import Foundation
 import AsyncAlgorithms
 
 /// Represents a server that can create and handle client sessions.
-class Server<A, B> {
+public class Server<A, B> {
     
     /// The public channel for receiving session requests from clients.
     let channel: AsyncChannel<Sendable>

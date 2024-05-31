@@ -11,6 +11,5 @@ import XCTest
 @testable import SwiftSessions
 
 final class LoopTests: XCTestCase {
-
     
 }

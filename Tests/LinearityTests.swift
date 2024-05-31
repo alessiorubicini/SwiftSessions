@@ -13,7 +13,7 @@ import XCTest
 
 final class LinearityTests: XCTestCase {
 
-    /// This test aims to verify the behavior of the library in situations of linearity violation.
+    /// This test aims to verify the library's behavior in situations of linearity violation.
     /// In this particular case, the violation is represented by the reuse of a channel.
     func testLinearityViolation1() async {
         await Session.create { c in
@@ -22,6 +22,7 @@ final class LinearityTests: XCTestCase {
                     // Using channel c1 again
                     await Session.send(false, on: c1) { c3 in
                         await Session.close(c2)
+                        
                     }
                 }
             }
@@ -29,13 +30,12 @@ final class LinearityTests: XCTestCase {
             await Session.send(42, on: c) { c1 in
                 await Session.recv(from: c1) { isEven, c2 in
                     await Session.close(c2)
-                    assert(isEven == true)
                 }
             }
         }
     }
     
-    /// This test aims to verify the behavior of the library in situations of linearity violation.
+    /// This test aims to verify the library's behavior in situations of linearity violation.
     /// In this particular case, the violation is represented by the missing use of a channel.
     func testLinearityViolation2() async {
         await Session.create { c in

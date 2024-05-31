@@ -18,17 +18,17 @@ extension Session {
     ///   - payload: The payload to be sent on the channel.
     ///   - chan: The channel on which the payload is sent.
     /// - Returns: The continuation channel
-    static func send<C, D, E>(_ payload: C, on chan: Channel<(C, Channel<D, E>), Empty>) async -> Channel<E, D> {
-        await chan.send(payload)
-        return Channel<E, D>(channel: chan.asyncChannel)
+    static func send<C, D, E>(_ payload: C, on channel: Channel<(C, Channel<D, E>), Empty>) async -> Channel<E, D> {
+        await channel.send(payload)
+        return Channel<E, D>(from: channel)
     }
     
     /// Receives a message from the channel and returns it along with the continuation channel.
     /// - Parameter chan: The channel from which the message is received.
     /// - Returns: A tuple containing the received message and the continuation channel.
-    static func recv<C, D, E>(from chan: Channel<Empty, (C, Channel<D, E>)>) async -> (C, Channel<D, E>) {
-        let msg = await chan.recv()
-        return (msg as! C, Channel<D, E>(channel: chan.asyncChannel))
+    static func recv<C, D, E>(from channel: Channel<Empty, (C, Channel<D, E>)>) async -> (C, Channel<D, E>) {
+        let msg = await channel.recv()
+        return (msg as! C, Channel<D, E>(from: channel))
     }
     
     /// Offers a choice between two branches on the given channel, and returns the selected branch.
