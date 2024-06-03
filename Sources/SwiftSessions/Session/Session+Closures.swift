@@ -24,7 +24,7 @@ extension Session {
             try await channel.send(payload)
             let newChannel = Channel<C, B>(from: channel)
             await continuation(newChannel)
-            if !newChannel.isUsed {
+            if !newChannel.hasBeenUsed() {
                 throw LinearityError.channelNotUsed(newChannel)
             }
         } catch {
@@ -42,7 +42,7 @@ extension Session {
             let msg = try await channel.recv()
             let newChannel = Channel<B, C>(from: channel)
             await continuation((msg as! A, newChannel))
-            if !newChannel.isUsed {
+            if !newChannel.hasBeenUsed() {
                 throw LinearityError.channelNotUsed(newChannel)
             }
         } catch {

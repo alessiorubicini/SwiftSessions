@@ -18,10 +18,10 @@ extension DispatchQueue {
 public final class Channel<A, B>: @unchecked Sendable {
     
     /// Underlying asynchronous channel for communication.
-    let asyncChannel: AsyncChannel<Sendable>
+    public let asyncChannel: AsyncChannel<Sendable>
     
     /// Determines if the channel has been used or not.
-    var isUsed: Bool = false
+    private var isUsed: Bool = false
     
     /// Initializes a new channel with the given asynchronous channel.
     /// - Parameter channel: The underlying asynchronous channel for communication.
