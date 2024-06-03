@@ -22,9 +22,13 @@ extension Session {
     static func send<A, B, C>(_ payload: A, on channel: Channel<(A, Channel<B, C>), Empty>, continuation: @escaping (Channel<C, B>) async -> Void) async {
         do {
             try await channel.send(payload)
-            await continuation(Channel<C, B>(from: channel))
+            let newChannel = Channel<C, B>(from: channel)
+            await continuation(newChannel)
+            if !newChannel.isUsed {
+                throw LinearityError.channelNotUsed(newChannel)
+            }
         } catch {
-            await channel.close()
+            print(error.localizedDescription)
         }
     }
     
@@ -36,9 +40,13 @@ extension Session {
     static func recv<A, B, C>(from channel: Channel<Empty, (A, Channel<B, C>)>, continuation: @escaping ((A, Channel<B, C>)) async -> Void) async {
         do {
             let msg = try await channel.recv()
-            await continuation((msg as! A, Channel<B, C>(from: channel)))
+            let newChannel = Channel<B, C>(from: channel)
+            await continuation((msg as! A, newChannel))
+            if !newChannel.isUsed {
+                throw LinearityError.channelNotUsed(newChannel)
+            }
         } catch {
-            await channel.close()
+            print(error.localizedDescription)
         }
     }
     
@@ -50,14 +58,13 @@ extension Session {
     static func offer<A, B, C, D>(on channel: Channel<Empty, Or<Channel<A, B>, Channel<C, D>>>, _ side1: @escaping (Channel<A, B>) async -> Void, or side2: @escaping (Channel<C, D>) async -> Void) async {
         do {
             let bool = try await channel.recv() as! Bool
-            
             if bool {
                 await side1(Channel<A, B>(from: channel))
             } else {
                 await side2(Channel<C, D>(from: channel))
             }
         } catch {
-            await channel.close()
+            print(error.localizedDescription)
         }
     }
     
@@ -70,7 +77,7 @@ extension Session {
             try await channel.send(true as Sendable)
             await continuation(Channel<B, A>(from: channel))
         } catch {
-            await channel.close()
+            print(error.localizedDescription)
         }
     }
     
@@ -83,7 +90,7 @@ extension Session {
             try await channel.send(false as Sendable)
             await continuation(Channel<D, C>(from: channel))
         } catch {
-            await channel.close()
+            print(error.localizedDescription)
         }
     }
     

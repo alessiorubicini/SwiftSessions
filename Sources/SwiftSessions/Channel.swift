@@ -8,10 +8,14 @@
 import Foundation
 import AsyncAlgorithms
 
+extension DispatchQueue {
+    static let channelMutatingLock = DispatchQueue(label: "channel.lock.queue")
+}
+
 /// Represents a communication channel that enforces session types.
 ///   - `A`: The type of messages that can be sent on the channel.
 ///   - `B`: The type of messages that can be received on the channel.
-public actor Channel<A, B> {
+public final class Channel<A, B>: @unchecked Sendable {
     
     /// Underlying asynchronous channel for communication.
     let asyncChannel: AsyncChannel<Sendable>
@@ -31,40 +35,56 @@ public actor Channel<A, B> {
         self.asyncChannel = channel.asyncChannel
     }
 
-    /// Sends the given element on the async channel
-    /// - Parameter element: the element to be sent
-    public func send(_ element: Sendable) async throws {
-        guard !isUsed else {
-            close()
-            throw LinearityError.channelUsedTwice
-        }
+    /// Resumes all the operations on the underlying asynchronous channel
+    /// and terminates the communication
+    public func close() {
         markAsUsed()
-        await asyncChannel.send(element)
+        asyncChannel.finish()
     }
+    
+    private func markAsUsed() {
+        DispatchQueue.channelMutatingLock.sync {
+            isUsed = true
+        }
+    }
+    
+    public func hasBeenUsed() -> Bool {
+        return isUsed
+    }
+    
+    /// A description of the channel, including the types `A` and `B`.
+    public var description: String {
+        "Channel<\(A.self), \(B.self)>"
+    }
+    
+}
+
+extension Channel where A == Empty {
     
     /// Receives an element from the async channel
     /// - Returns: the element received
-    public func recv() async throws -> Sendable {
+    func recv() async throws -> Sendable {
         guard !isUsed else {
             close()
-            throw LinearityError.channelUsedTwice
+            throw LinearityError.channelUsedTwice(self)
         }
         markAsUsed()
         return await asyncChannel.first(where: { _ in true })!
     }
     
-    /// Resumes all the operations on the underlying asynchronous channel
-    /// and terminates the communication
-    public func close() {
-        asyncChannel.finish()
-    }
+}
+
+extension Channel where B == Empty {
     
-    private func markAsUsed() {
-        isUsed = true
-    }
-    
-    public func hasBeenUsed() -> Bool {
-        return isUsed
+    /// Sends the given element on the async channel
+    /// - Parameter element: the element to be sent
+    func send(_ element: Sendable) async throws {
+        guard !isUsed else {
+            close()
+            throw LinearityError.channelUsedTwice(self)
+        }
+        markAsUsed()
+        await asyncChannel.send(element)
     }
     
 }
