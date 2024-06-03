@@ -2,6 +2,13 @@
 
 **SwiftSessions** is an implementation of [session types](https://en.wikipedia.org/wiki/Session_type) in Swift that enables and enforces bi-directional session-based process communication.
 
+The library currently supports the following features:
+- session type inference (only with closures)
+- session types with binary branches
+- duality constraints on session types
+- dynamic linearity checking
+- client/server architecture for session initialization
+
 ## Overview
 
 ### Programming Styles

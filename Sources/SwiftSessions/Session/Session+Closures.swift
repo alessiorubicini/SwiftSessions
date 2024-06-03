@@ -29,6 +29,7 @@ extension Session {
             }
         } catch {
             print(error.localizedDescription)
+            channel.close()
         }
     }
     
@@ -47,6 +48,7 @@ extension Session {
             }
         } catch {
             print(error.localizedDescription)
+            channel.close()
         }
     }
     
@@ -65,6 +67,7 @@ extension Session {
             }
         } catch {
             print(error.localizedDescription)
+            channel.close()
         }
     }
     
@@ -78,6 +81,7 @@ extension Session {
             await continuation(Channel<B, A>(from: channel))
         } catch {
             print(error.localizedDescription)
+            channel.close()
         }
     }
     
@@ -91,6 +95,7 @@ extension Session {
             await continuation(Channel<D, C>(from: channel))
         } catch {
             print(error.localizedDescription)
+            channel.close()
         }
     }
     

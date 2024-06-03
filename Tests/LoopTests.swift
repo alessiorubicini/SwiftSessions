@@ -19,7 +19,6 @@ final class LoopTests: XCTestCase {
         let s = await Server { c in
             await Session.recv(from: c) { num, c in
                 sum += num
-                print("summed \(num)")
                 await Session.close(c)
             }
         }
