@@ -19,7 +19,7 @@ extension Session {
     ///   - chan: The channel on which the payload is sent.
     /// - Returns: The continuation channel
     static func send<C, D, E>(_ payload: C, on channel: Channel<(C, Channel<D, E>), Empty>) async -> Channel<E, D> {
-        await channel.send(payload)
+        try! await channel.send(payload)
         return Channel<E, D>(from: channel)
     }
     
@@ -27,7 +27,7 @@ extension Session {
     /// - Parameter chan: The channel from which the message is received.
     /// - Returns: A tuple containing the received message and the continuation channel.
     static func recv<C, D, E>(from channel: Channel<Empty, (C, Channel<D, E>)>) async -> (C, Channel<D, E>) {
-        let msg = await channel.recv()
+        let msg = try! await channel.recv()
         return (msg as! C, Channel<D, E>(from: channel))
     }
     
@@ -36,7 +36,7 @@ extension Session {
     /// - Returns: An `Or` enum value containing either the first branch channel of type `Channel<A, B>` or the second branch channel of type `Channel<C, D>`.
     static func offer<A, B, C, D>(_ channel: Channel<Empty, Or<Channel<A, B>, Channel<C, D>>>) async -> Or<Channel<A, B>, Channel<C, D>> {
         
-        let bool = await channel.recv() as! Bool
+        let bool = try! await channel.recv() as! Bool
         
         if bool {
             return Or.left(Channel<A, B>(from: channel))

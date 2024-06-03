@@ -17,11 +17,10 @@ public class Client {
     ///   - closure: The closure to execute on the client's channel after connecting.
     init<A, B>(for server: Server<A, B>, _ closure: @escaping (_: Channel<B, A>) async -> Void) async {
         let channel: AsyncChannel<Sendable> = AsyncChannel()
-        let c1 = Channel<A, B>(with: channel)
-        let c2 = Channel<B, A>(with: channel)
-        await server.connect(with: c1)
+        await server.connect(with: channel)
+        let c = Channel<B, A>(with: channel)
         Task {
-            await closure(c2)
+            await closure(c)
         }
     }
 }

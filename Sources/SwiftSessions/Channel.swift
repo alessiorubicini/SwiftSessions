@@ -33,10 +33,10 @@ public actor Channel<A, B> {
 
     /// Sends the given element on the async channel
     /// - Parameter element: the element to be sent
-    public func send(_ element: Sendable) async {
+    public func send(_ element: Sendable) async throws {
         guard !isUsed else {
             close()
-            fatalError("Cannot send. Channel already used.")
+            throw LinearityError.channelUsedTwice
         }
         markAsUsed()
         await asyncChannel.send(element)
@@ -44,10 +44,10 @@ public actor Channel<A, B> {
     
     /// Receives an element from the async channel
     /// - Returns: the element received
-    public func recv() async -> Sendable {
+    public func recv() async throws -> Sendable {
         guard !isUsed else {
             close()
-            fatalError("Cannot recv. Channel already used.")
+            throw LinearityError.channelUsedTwice
         }
         markAsUsed()
         return await asyncChannel.first(where: { _ in true })!
@@ -61,6 +61,10 @@ public actor Channel<A, B> {
     
     private func markAsUsed() {
         isUsed = true
+    }
+    
+    public func hasBeenUsed() -> Bool {
+        return isUsed
     }
     
 }

@@ -22,7 +22,6 @@ final class LinearityTests: XCTestCase {
                     // Using channel c1 again
                     await Session.send(false, on: c1) { c3 in
                         await Session.close(c2)
-                        
                     }
                 }
             }

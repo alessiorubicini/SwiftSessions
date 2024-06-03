@@ -20,8 +20,9 @@ public class Server<A, B> {
         publicChannel = AsyncChannel()
         Task {
             while true {
-                for await message in publicChannel {
-                    let channel = message as! Channel<A, B>
+                for await request in publicChannel {
+                    let asyncChannel = request as! AsyncChannel<Sendable>
+                    let channel = Channel<A, B>(with: asyncChannel)
                     Task {
                         await closure(channel)
                     }
@@ -30,7 +31,7 @@ public class Server<A, B> {
         }
     }
     
-    public func connect(with channel: Channel<A, B>) async {
+    public func connect(with channel: AsyncChannel<Sendable>) async {
         await publicChannel.send(channel)
     }
 }
