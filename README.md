@@ -9,6 +9,10 @@ The library currently supports the following features:
 - dynamic linearity checking
 - client/server architecture for session initialization
 
+## Authors and Acknowledgments
+
+This library was developed as part of a Bachelor’s degree thesis project at University of Camerino. The project was completed by [Alessio Rubicini](https://github.com/alessiorubicini) under the supervision of professor [Luca Padovani](https://github.com/boystrange).
+
 ## Overview
 
 ### Programming Styles
@@ -118,10 +122,6 @@ dependencies: [
 - Swift 5.9+
 - Xcode 15+
 - Compatible with iOS 14.0+ / macOS 10.15+ / tvOS 14.0+ / watchOS 6.0+
-
-## Authors and Acknowledgments
-
-This library was developed as part of a Bachelor’s degree thesis project at University of Camerino. The project was completed by [Alessio Rubicini](https://github.com/alessiorubicini) under the supervision of professor [Luca Padovani](https://github.com/boystrange).
 
 ## License
 
