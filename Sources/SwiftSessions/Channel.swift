@@ -21,13 +21,17 @@ public final class Channel<A, B>: @unchecked Sendable {
     /// Underlying asynchronous channel for communication.
     public let asyncChannel: AsyncChannel<Sendable>
     
-    private let channelMutatingLock: DispatchQueue
-    
     /// A read-only boolean flag indicating whether the instance has been consumed.
     /// This property is set to `true` when the channel is consumed and cannot be consumed again.
     ///
     /// Once set to `true`, this property cannot be changed back to `false`.
     private(set) var isConsumed: Bool = false
+    
+    /// A queue to protect concurrent access to mutating methods of the channel.
+    ///
+    /// This queue serializes access to methods that modify the channel's consumed state,
+    /// ensuring thread safety and preventing race conditions.
+    private let channelMutatingLock: DispatchQueue
     
     /// Initializes a new channel with the given asynchronous channel.
     /// - Parameter channel: The underlying asynchronous channel for communication.
