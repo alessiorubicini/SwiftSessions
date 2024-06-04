@@ -16,7 +16,7 @@ final class LinearityTests: XCTestCase {
     /// This test aims to verify the library's behavior in situations of linearity violation.
     /// In this particular case, the violation is represented by the reuse of a channel.
     ///
-    /// Should print `Channel<(Bool, Channel<Empty, Empty>), Empty> was used twice.`
+    /// Should print `Channel<(Bool, Channel<Empty, Empty>), Empty> was consumed twice.`
     func testLinearityViolation1() async {
         await Session.create { c in
             await Session.recv(from: c) { num, c1 in
@@ -42,7 +42,7 @@ final class LinearityTests: XCTestCase {
     /// This test aims to verify the library's behavior in situations of linearity violation.
     /// In this particular case, the violation is represented by the missing use of a channel.
     ///
-    /// Should print `Channel Channel<Empty, (Bool, Channel<Empty, Empty>)> was not used`
+    /// Should print `Channel Channel<Empty, (Bool, Channel<Empty, Empty>)> was not consumed.`
     func testLinearityViolation2() async {
         await Session.create { c in
             await Session.recv(from: c) { num, c1 in

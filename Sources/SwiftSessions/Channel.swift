@@ -13,15 +13,32 @@ extension DispatchQueue {
 }
 
 /// Represents a communication channel that enforces session types.
-///   - `A`: The type of messages that can be sent on the channel.
-///   - `B`: The type of messages that can be received on the channel.
+///
+/// This class provides a safe and linear way to communicate between different parts of your program using session types.
+/// It guarantees that the channel is consumed only once, enforcing the expected communication pattern.
+///
+/// - Parameters:
+///   - A: The type of messages that can be sent on the channel.
+///   - B: The type of messages that can be received on the channel.
 public final class Channel<A, B>: @unchecked Sendable {
     
     /// Underlying asynchronous channel for communication.
     public let asyncChannel: AsyncChannel<Sendable>
     
-    /// Determines if the channel has been used or not.
-    private var isUsed: Bool = false
+    /// A read-only boolean flag indicating whether the instance has been consumed.
+    /// This property is set to `true` when the channel is consumed and cannot be consumed again.
+    ///
+    /// Once set to `true`, this property cannot be changed back to `false`.
+    private(set) var isConsumed: Bool = false
+    
+    /// A human-readable description of the channel, including the message types.
+    ///
+    /// This property returns a string representation of the channel, specifying the types of messages it can send (`A`) and receive (`B`).
+    ///
+    /// - Returns: A string representation of the channel in the format "Channel<A, B>".
+    public var description: String {
+        "Channel<\(A.self), \(B.self)>"
+    }
     
     /// Initializes a new channel with the given asynchronous channel.
     /// - Parameter channel: The underlying asynchronous channel for communication.
@@ -37,24 +54,31 @@ public final class Channel<A, B>: @unchecked Sendable {
 
     /// Resumes all the operations on the underlying asynchronous channel
     /// and terminates the communication
+    ///
+    /// This method closes the channel, signaling the end of communication. Any further attempts to send or receive on the channel will result in an error.
     public func close() {
-        markAsUsed()
+        consume()
         asyncChannel.finish()
     }
     
-    private func markAsUsed() {
+    /// Marks the channel as consumed, ensuring linearity guarantees.
+    ///
+    /// This method is called internally before sending or receiving on the channel.
+    /// It throws an error if the channel has already been consumed,
+    /// enforcing the linear usage pattern of session types.
+    ///
+    /// - Throws: `LinearityError.channelConsumedTwice` if the channel has already been consumed.
+    private func consume() {
         DispatchQueue.channelMutatingLock.sync {
-            isUsed = true
+            do {
+                guard !isConsumed else {
+                    throw LinearityError.channelConsumedTwice(self)
+                }
+                isConsumed = true
+            } catch {
+                fatalError(error.localizedDescription)
+            }
         }
-    }
-    
-    public func hasBeenUsed() -> Bool {
-        return isUsed
-    }
-    
-    /// A description of the channel, including the types `A` and `B`.
-    public var description: String {
-        "Channel<\(A.self), \(B.self)>"
     }
     
 }
@@ -62,13 +86,13 @@ public final class Channel<A, B>: @unchecked Sendable {
 extension Channel where A == Empty {
     
     /// Receives an element from the async channel
+    ///
+    /// This method attempts to receive a message from the channel and consumes it.
+    ///
+    /// - Throws: `LinearityError.channelConsumedTwice` if the channel has already been consumed.
     /// - Returns: the element received
-    func recv() async throws -> Sendable {
-        guard !isUsed else {
-            close()
-            throw LinearityError.channelUsedTwice(self)
-        }
-        markAsUsed()
+    func recv() async -> Sendable {
+        consume()
         return await asyncChannel.first(where: { _ in true })!
     }
     
@@ -77,13 +101,13 @@ extension Channel where A == Empty {
 extension Channel where B == Empty {
     
     /// Sends the given element on the async channel
+    ///
+    /// This method sends a message to the channel and consumes it.
+    ///
     /// - Parameter element: the element to be sent
-    func send(_ element: Sendable) async throws {
-        guard !isUsed else {
-            close()
-            throw LinearityError.channelUsedTwice(self)
-        }
-        markAsUsed()
+    /// - Throws: `LinearityError.channelConsumedTwice` if the channel has already been consumed.
+    func send(_ element: Sendable) async {
+        consume()
         await asyncChannel.send(element)
     }
     
