@@ -8,10 +8,6 @@
 import Foundation
 import AsyncAlgorithms
 
-extension DispatchQueue {
-    static let channelMutatingLock = DispatchQueue(label: "channel.lock.queue")
-}
-
 /// Represents a communication channel that enforces session types.
 ///
 /// This class provides a safe and linear way to communicate between different parts of your program using session types.
@@ -25,6 +21,8 @@ public final class Channel<A, B>: @unchecked Sendable {
     /// Underlying asynchronous channel for communication.
     public let asyncChannel: AsyncChannel<Sendable>
     
+    private let channelMutatingLock: DispatchQueue
+    
     /// A read-only boolean flag indicating whether the instance has been consumed.
     /// This property is set to `true` when the channel is consumed and cannot be consumed again.
     ///
@@ -35,12 +33,14 @@ public final class Channel<A, B>: @unchecked Sendable {
     /// - Parameter channel: The underlying asynchronous channel for communication.
     init(with channel: AsyncChannel<Sendable>) {
         self.asyncChannel = channel
+        self.channelMutatingLock = DispatchQueue(label: "channel.lock.queue")
     }
     
     /// Initializes a new channel from an existing channel
     /// - Parameter channel: The channel from which to create the new channel.
     init<C, D>(from channel: Channel<C, D>) {
         self.asyncChannel = channel.asyncChannel
+        self.channelMutatingLock = DispatchQueue(label: "channel.lock.queue")
     }
 
     /// Resumes all the operations on the underlying asynchronous channel
@@ -60,7 +60,7 @@ public final class Channel<A, B>: @unchecked Sendable {
     ///
     /// - Throws: `LinearityError.channelConsumedTwice` if the channel has already been consumed.
     private func consume() {
-        DispatchQueue.channelMutatingLock.sync {
+        channelMutatingLock.sync {
             do {
                 guard !isConsumed else {
                     throw LinearityError.channelConsumedTwice(self)
