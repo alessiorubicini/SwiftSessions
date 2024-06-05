@@ -16,7 +16,7 @@ import AsyncAlgorithms
 /// - Parameters:
 ///   - A: The type of messages that can be sent on the channel.
 ///   - B: The type of messages that can be received on the channel.
-public final class Channel<A, B>: @unchecked Sendable {
+public final class Channel<A, B> {
     
     /// Underlying asynchronous channel for communication.
     public let asyncChannel: AsyncChannel<Sendable>
@@ -26,24 +26,28 @@ public final class Channel<A, B>: @unchecked Sendable {
     /// This property is set to `true` when the channel is consumed and cannot be consumed again.
     private(set) var isConsumed: Bool = false
     
-    /// A queue to protect concurrent access to mutating methods of the channel.
-    ///
-    /// This queue serializes access to methods that modify the channel's consumed state,
-    /// ensuring thread safety and preventing race conditions.
-    private let channelMutatingLock: DispatchQueue
-    
     /// Initializes a new channel with the given asynchronous channel.
     /// - Parameter channel: The underlying asynchronous channel for communication.
     init(with channel: AsyncChannel<Sendable>) {
         self.asyncChannel = channel
-        self.channelMutatingLock = DispatchQueue(label: "channel.lock.queue")
     }
     
     /// Initializes a new channel from an existing channel
     /// - Parameter channel: The channel from which to create the new channel.
     init<C, D>(from channel: Channel<C, D>) {
         self.asyncChannel = channel.asyncChannel
-        self.channelMutatingLock = DispatchQueue(label: "channel.lock.queue")
+    }
+    
+    /// Deinitializes the channel and ensures it has been consumed.
+    ///
+    /// This method is called automatically when the channel is about to be deallocated.
+    /// It verifies that the channel has been properly consumed before deallocation.
+    /// If the channel has not been consumed, a fatal error is triggered, 
+    /// indicating a linearity violation.
+    deinit {
+        if !isConsumed {
+            fatalError("\(self.description) was not consumed")
+        }
     }
 
     /// Resumes all the operations on the underlying asynchronous channel
@@ -63,16 +67,10 @@ public final class Channel<A, B>: @unchecked Sendable {
     ///
     /// - Throws: `LinearityError.channelConsumedTwice` if the channel has already been consumed.
     private func consume() {
-        channelMutatingLock.sync {
-            do {
-                guard !isConsumed else {
-                    throw LinearityError.channelConsumedTwice(self)
-                }
-                isConsumed = true
-            } catch {
-                fatalError(error.localizedDescription)
-            }
+        guard !isConsumed else {
+            fatalError("\(self.description) was used twice")
         }
+        isConsumed = true
     }
     
     /// A human-readable description of the channel, including the message types.
