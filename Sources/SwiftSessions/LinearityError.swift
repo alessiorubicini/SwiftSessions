@@ -1,6 +1,6 @@
 //
-//  File.swift
-//  
+//  LinearityError.swift
+//
 //
 //  Created by Alessio Rubicini on 03/06/24.
 //

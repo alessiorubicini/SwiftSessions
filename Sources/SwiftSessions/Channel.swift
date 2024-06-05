@@ -21,10 +21,9 @@ public final class Channel<A, B>: @unchecked Sendable {
     /// Underlying asynchronous channel for communication.
     public let asyncChannel: AsyncChannel<Sendable>
     
-    /// A read-only boolean flag indicating whether the instance has been consumed.
-    /// This property is set to `true` when the channel is consumed and cannot be consumed again.
+    /// A read-only flag indicating whether the instance has been consumed.
     ///
-    /// Once set to `true`, this property cannot be changed back to `false`.
+    /// This property is set to `true` when the channel is consumed and cannot be consumed again.
     private(set) var isConsumed: Bool = false
     
     /// A queue to protect concurrent access to mutating methods of the channel.
