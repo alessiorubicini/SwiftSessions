@@ -5,8 +5,8 @@
 The library currently supports the following features:
 - session type inference (only with closures)
 - session types with binary branches
+- hybrid type checking
 - duality constraints on session types
-- dynamic linearity checking
 - client/server architecture for session initialization
 
 ## Authors and Acknowledgments
