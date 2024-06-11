@@ -50,22 +50,13 @@ public final class Channel<A, B> {
         }
     }
 
-    /// Resumes all the operations on the underlying asynchronous channel
-    /// and terminates the communication
-    ///
-    /// This method closes the channel, signaling the end of communication. Any further attempts to send or receive on the channel will result in an error.
-    public func close() {
-        consume()
-        asyncChannel.finish()
-    }
-    
     /// Marks the channel as consumed, ensuring linearity guarantees.
     ///
     /// This method is called internally before a primitive is executed on the channel.
     /// It throws an error if the channel has already been consumed,
     /// enforcing the linear usage pattern of session types.
     ///
-    /// - Throws: `LinearityError.channelConsumedTwice` if the channel has already been consumed.
+    /// - Throws: a fatal error if the channel has already been consumed.
     private func consume() {
         guard !isConsumed else {
             fatalError("\(self.description) was used twice")
@@ -74,10 +65,6 @@ public final class Channel<A, B> {
     }
     
     /// A human-readable description of the channel, including the message types.
-    ///
-    /// This property returns a string representation of the channel, specifying the types of messages it can send (`A`) and receive (`B`).
-    ///
-    /// - Returns: A string representation of the channel in the format "Channel<A, B>".
     public var description: String {
         "Channel<\(A.self), \(B.self)>"
     }
@@ -90,7 +77,7 @@ extension Channel where A == Empty {
     ///
     /// This method attempts to receive a message from the channel and consumes it.
     ///
-    /// - Throws: `LinearityError.channelConsumedTwice` if the channel has already been consumed.
+    /// - Throws: a fatal error if the channel has already been consumed.
     /// - Returns: the element received
     func recv() async -> Sendable {
         consume()
@@ -106,10 +93,23 @@ extension Channel where B == Empty {
     /// This method sends a message to the channel and consumes it.
     ///
     /// - Parameter element: the element to be sent
-    /// - Throws: `LinearityError.channelConsumedTwice` if the channel has already been consumed.
+    /// - Throws: a fatal error if the channel has already been consumed.
     func send(_ element: Sendable) async {
         consume()
         await asyncChannel.send(element)
+    }
+    
+}
+
+extension Channel where A == Empty, B == Empty {
+    
+    /// Resumes all the operations on the underlying asynchronous channel
+    /// and terminates the communication
+    ///
+    /// This method closes the channel, signaling the end of communication.
+    func close() {
+        consume()
+        asyncChannel.finish()
     }
     
 }
