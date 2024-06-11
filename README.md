@@ -11,13 +11,13 @@ The library currently supports the following features:
 
 ## Authors and Acknowledgments
 
-This library was developed as part of a Bachelor’s degree thesis project at University of Camerino. The project was completed by [Alessio Rubicini](https://github.com/alessiorubicini) under the supervision of professor [Luca Padovani](https://github.com/boystrange).
+This library was developed as part of a Bachelor’s degree thesis project at the University of Camerino. The project was completed by [Alessio Rubicini](https://github.com/alessiorubicini) under the supervision of professor [Luca Padovani](https://github.com/boystrange).
 
 ## Overview
 
 ### Programming Styles
 This library offers two distinct styles for managing session types:
-- **Continuation with Closures**: closures are used to handle the next steps after sending or receiving a message. This approach makes the flow of logic explicit and easy to follow within the closure context. It's particularly useful for straightforward communication sequences. 
+- **Continuation with Closures**: protocol continuations are passed as closures. This approach makes the flow of logic explicit and easy to follow within the closure context. It's particularly useful for straightforward communication sequences.
     
     ```swift
     await Session.create { c in
@@ -37,7 +37,8 @@ This library offers two distinct styles for managing session types:
     }
     ```
     
-    The main pro of this style is that it allows complete type inference of the communication protocol, while the main con is nested code since indentation goes deeper and deeper as the protocol complexity grows.
+    - Pros: Complete type inference of the communication protocol.
+	- Cons: Nested code structure.
     
 - **Channel Passing for Continuation**: this style involves returning continuation channels from communication primitives. It offers greater flexibility, enabling more modular and reusable code, particularly for complex communication sequences.
 
@@ -57,17 +58,18 @@ This library offers two distinct styles for managing session types:
     await Session.close(c2)
     ```
     
-    The main pro of this style is code simplicity since it doesn't require indenting more and more every time a primitive is called, while the main con is missing support to complete type inference.
+    - Pros: Simplicity, particularly for avoiding deep indentation.
+	- Cons: Incomplete type inference support.
 
- Each style provides a unique approach to handling session-based binary communication, and comes with its own pros and cons. By supporting both styles, SwiftSessions allows you to choose the best approach (or both of them in a hybrid way!) according to your needs and coding preferences.
- 
- For additional examples, see the [Tests](Tests) folder.
+Each style provides a unique approach to handling session-based binary communication and comes with its own pros and cons. By supporting both styles, SwiftSessions allows you to choose the best approach (or use both in a hybrid way!) according to your needs and coding preferences.
+
+For additional examples, see the [Tests](Tests) folder.
  
 ### Client/Server Architecture
 
-While the library can be used in a straightforward and concise manner, creating disposable sessions as seen in the previous examples, it also supports a client/server architectural style.
+Instead of creating disposable sessions as seen in the previous examples, you can also initialize sessions using a client/server architectural style.
 
-A **server** is responsible for creating and managing multiple sessions that can handle a specific behavior or protocol. Many **clients** can be spawned and used with the same server to interact dually according to that defined behavior. This allows to define a protocol's side only once, and use it as many times as we want.
+A **server** is responsible for creating and managing multiple sessions that can handle a specific protocol. Many **clients** can be spawned and used with the same server to interact dually according to that defined protocol. This allows to define a protocol's side only once, and use it as many times as we want.
 
 ```swift
 // Server side
@@ -119,8 +121,8 @@ dependencies: [
 
 ## Requirements
 
-- Swift 5.9+
-- Xcode 15+
+- Swift 5.5+
+- Xcode 13+
 - Compatible with iOS 14.0+ / macOS 10.15+ / tvOS 14.0+ / watchOS 6.0+
 
 ## License
