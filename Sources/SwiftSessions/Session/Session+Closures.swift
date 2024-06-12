@@ -53,7 +53,7 @@ extension Session {
     ///   - channel: The channel on which the left branch is selected. This channel sends a value indicating the left branch selection (`true`).
     ///   - continuation: A closure to be executed after the left branch is selected. This closure receives a channel of type `Channel<B, A>`.
     static func left<A, B, C, D>(_ channel: Channel<Or<Channel<A, B>, Channel<C, D>>, Empty>, continuation: @escaping (Channel<B, A>) async -> Void) async {
-        await channel.send(true as Sendable)
+        await channel.send(true)
         await continuation(Channel<B, A>(from: channel))
     }
     
@@ -62,7 +62,7 @@ extension Session {
     ///   - channel: The channel on which the right branch is selected. This channel sends a value indicating the right branch selection (`false`).
     ///   - continuation: A closure to be executed after the right branch is selected. This closure receives a channel of type `Channel<D, C>`.
     static func right<A, B, C, D>(_ channel: Channel<Or<Channel<A, B>, Channel<C, D>>, Empty>, continuation: @escaping (Channel<D, C>) async -> Void) async {
-        await channel.send(false as Sendable)
+        await channel.send(false)
         await continuation(Channel<D, C>(from: channel))
     }
     
