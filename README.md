@@ -1,6 +1,6 @@
 # Swift Sessions
 
-**SwiftSessions** is a comprehensive Swift package that implements binary [session types](https://en.wikipedia.org/wiki/Session_type), providing a robust framework for ensuring safe and structured communication in concurrent systems.
+**Swift Sessions** is a comprehensive Swift package that implements binary [session types](https://en.wikipedia.org/wiki/Session_type), providing a robust framework for ensuring safe and structured communication in concurrent systems.
 
 The library currently supports the following features:
 - session type inference (only with closures)
@@ -122,10 +122,6 @@ dependencies: [
 )
 
 ```
-
-## Future directions
-
-
 
 ## Requirements
 
