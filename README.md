@@ -1,5 +1,8 @@
 # Swift Sessions
 
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Falessiorubicini%2FSwiftSessions%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/alessiorubicini/SwiftSessions)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Falessiorubicini%2FSwiftSessions%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/alessiorubicini/SwiftSessions)
+
 **Swift Sessions** is a Swift package that implements binary [session types](https://en.wikipedia.org/wiki/Session_type), providing a robust framework for ensuring safe and structured communication in concurrent systems.
 
 The library currently supports the following features:
@@ -126,8 +129,8 @@ dependencies: [
 
 ## Requirements
 
-- Swift 5.5+
-- Xcode 13+
+- Swift 5.10+
+- Xcode 15+
 - Compatible with iOS 14.0+ / macOS 10.15+ / tvOS 14.0+ / watchOS 6.0+
 
 ## License
