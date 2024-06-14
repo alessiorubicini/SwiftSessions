@@ -100,8 +100,8 @@ let c1 = await Client(for: server) { e in
 This architecture is useful for scenarios where multiple clients need to interact with a single server. It's also useful to implement complex protocols that involve loops and recursion.
 
 ## Future directions
+Swift 6.0 will introduce new features such as [noncopyable generics](https://developer.apple.com/wwdc24/10170), which will significantly enhance the capabilities of this library allowing static linearity checking.
 
-In upcoming versions of Swift, new features such as [non-copyable generics](https://github.com/swiftlang/swift-evolution/blob/main/proposals/0427-noncopyable-generics.md#conformance-to-copyable) are expected to be introduced, which will significantly enhance the capabilities of this library allowing static linearity checking.
 
 ## Installation
 
