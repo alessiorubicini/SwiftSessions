@@ -14,24 +14,24 @@ final class BranchingTests: XCTestCase {
 
     func testSumWithBranching() async {
         // One side of the communication channel
-        let c = await Session.create { c in
-            await Session.offer(on: c) { c in
-                await Session.recv(from: c) { num1, c in
-                    await Session.recv(from: c) { num2, c in
+        let e = await Session.create { e in
+            await Session.offer(on: e) { e in
+                await Session.recv(from: e) { num1, e in
+                    await Session.recv(from: e) { num2, e in
                         let sum: Int = num1 + num2
-                        await Session.send(sum, on: c) { c in
-                            await Session.close(c)
+                        await Session.send(sum, on: e) { e in
+                            await Session.close(e)
                         }
                     }
                 }
-            } or: { c in
-                await Session.recv(from: c) { num, c in
+            } or: { e in
+                await Session.recv(from: e) { num, e in
                     var result = 1
                     for i in 1...num {
                         result *= i
                     }
-                    await Session.send(result, on: c) { c in
-                        await Session.close(c)
+                    await Session.send(result, on: e) { e in
+                        await Session.close(e)
                     }
                 }
             }
@@ -39,11 +39,11 @@ final class BranchingTests: XCTestCase {
         }
         
         // Another side of the communication channel
-        await Session.left(c) { c in
-            await Session.send(2, on: c) { c in
-                await Session.send(3, on: c) { c in
-                    await Session.recv(from: c) { result, c in
-                        await Session.close(c)
+        await Session.left(e) { e in
+            await Session.send(2, on: e) { e in
+                await Session.send(3, on: e) { e in
+                    await Session.recv(from: e) { result, e in
+                        await Session.close(e)
                         assert(result == 5)
                     }
                 }
@@ -53,24 +53,24 @@ final class BranchingTests: XCTestCase {
     
     func testFactorialWithBranching() async {
         // One side of the communication channel
-        let c = await Session.create { c in
-            await Session.offer(on: c) { c in
-                await Session.recv(from: c) { num1, c in
-                    await Session.recv(from: c) { num2, c in
+        let e = await Session.create { e in
+            await Session.offer(on: e) { e in
+                await Session.recv(from: e) { num1, e in
+                    await Session.recv(from: e) { num2, e in
                         let sum: Int = num1 + num2
-                        await Session.send(sum, on: c) { c in
-                            await Session.close(c)
+                        await Session.send(sum, on: e) { e in
+                            await Session.close(e)
                         }
                     }
                 }
-            } or: { c in
-                await Session.recv(from: c) { num, c in
+            } or: { e in
+                await Session.recv(from: e) { num, e in
                     var result = 1
                     for i in 1...num {
                         result *= i
                     }
-                    await Session.send(result, on: c) { c in
-                        await Session.close(c)
+                    await Session.send(result, on: e) { e in
+                        await Session.close(e)
                     }
                 }
             }
@@ -78,10 +78,10 @@ final class BranchingTests: XCTestCase {
         }
         
         // Another side of the communication channel
-        await Session.right(c) { c in
-            await Session.send(3, on: c) { c in
-                await Session.recv(from: c) { result, c in
-                    await Session.close(c)
+        await Session.right(e) { e in
+            await Session.send(3, on: e) { e in
+                await Session.recv(from: e) { result, e in
+                    await Session.close(e)
                     assert(result == 6)
                 }
             }

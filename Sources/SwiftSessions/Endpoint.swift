@@ -8,25 +8,25 @@
 import Foundation
 import AsyncAlgorithms
 
-/// Represents a communication channel that enforces session types.
+/// Represents a communication endpoint that enforces session types.
 ///
 /// This class provides a safe and linear way to communicate between different parts of your program using session types.
-/// It guarantees that the channel is consumed only once, enforcing the expected communication pattern.
+/// It guarantees that the endpoint is consumed only once, enforcing the expected communication pattern.
 ///
 /// - Parameters:
-///   - A: The type of messages that can be sent on the channel.
-///   - B: The type of messages that can be received on the channel.
-public final class Channel<A, B> {
+///   - A: The type of messages that can be sent to the endpoint.
+///   - B: The type of messages that can be received from the endpoint.
+public final class Endpoint<A, B> {
     
     /// Underlying asynchronous channel for communication.
     public let asyncChannel: AsyncChannel<Sendable>
     
     /// A read-only flag indicating whether the instance has been consumed.
     ///
-    /// This property is set to `true` when the channel is consumed and cannot be consumed again.
+    /// This property is set to `true` when the endpoint is consumed and cannot be consumed again.
     private(set) var isConsumed: Bool = false
     
-    /// Initializes a new channel with the given asynchronous channel.
+    /// Initializes a new endpoint with the given asynchronous channel.
     /// - Parameter channel: The underlying asynchronous channel for communication.
     init(with channel: AsyncChannel<Sendable>) {
         self.asyncChannel = channel
@@ -34,8 +34,8 @@ public final class Channel<A, B> {
     
     /// Initializes a new channel from an existing channel
     /// - Parameter channel: The channel from which to create the new channel.
-    init<C, D>(from channel: Channel<C, D>) {
-        self.asyncChannel = channel.asyncChannel
+    init<C, D>(from endpoint: Endpoint<C, D>) {
+        self.asyncChannel = endpoint.asyncChannel
     }
     
     /// Deinitializes the channel and ensures it has been consumed.
@@ -59,7 +59,7 @@ public final class Channel<A, B> {
     /// - Throws: a fatal error if the channel has already been consumed.
     private func consume() {
         guard !isConsumed else {
-            fatalError("\(self.description) was used twice")
+            fatalError("\(self.description) was consumed twice")
         }
         isConsumed = true
     }
@@ -71,7 +71,7 @@ public final class Channel<A, B> {
     
 }
 
-extension Channel where A == Empty {
+extension Endpoint where A == Empty {
     
     /// Receives an element from the async channel
     ///
@@ -86,7 +86,7 @@ extension Channel where A == Empty {
     
 }
 
-extension Channel where B == Empty {
+extension Endpoint where B == Empty {
     
     /// Sends the given element on the async channel
     ///
@@ -101,7 +101,7 @@ extension Channel where B == Empty {
     
 }
 
-extension Channel where A == Empty, B == Empty {
+extension Endpoint where A == Empty, B == Empty {
     
     /// Resumes all the operations on the underlying asynchronous channel
     /// and terminates the communication

@@ -7,54 +7,54 @@
 
 import Foundation
 
-/// Extension for the Session class that provides methods using channel passing for continuation for session type communications.
+/// Extension for the Session class that provides methods using endpoint passing for continuation for session type communications.
 ///
 /// This version of the library includes methods that allow users to send and receive messages,
-/// as well as offer and select between branches using channel passing for continuation.
+/// as well as offer and select between branches using endpoint passing for continuation.
 extension Session {
     
-    /// Sends a message on the channel and returns the continuation channel
+    /// Sends a message to the endpoint and returns the continuation endpoint
     /// - Parameters:
-    ///   - payload: The payload to be sent on the channel.
-    ///   - chan: The channel on which the payload is sent.
-    /// - Returns: The continuation channel
-    static func send<C, D, E>(_ payload: C, on channel: Channel<(C, Channel<D, E>), Empty>) async -> Channel<E, D> {
-        await channel.send(payload)
-        return Channel<E, D>(from: channel)
+    ///   - payload: The payload to be sent to the endpoint.
+    ///   - endpoint: The endpoint to which the payload is sent.
+    /// - Returns: The continuation endpoint
+    static func send<C, D, E>(_ payload: C, on endpoint: Endpoint<(C, Endpoint<D, E>), Empty>) async -> Endpoint<E, D> {
+        await endpoint.send(payload)
+        return Endpoint<E, D>(from: endpoint)
     }
     
-    /// Receives a message from the channel and returns it along with the continuation channel.
-    /// - Parameter chan: The channel from which the message is received.
-    /// - Returns: A tuple containing the received message and the continuation channel.
-    static func recv<C, D, E>(from channel: Channel<Empty, (C, Channel<D, E>)>) async -> (C, Channel<D, E>) {
-        let msg = await channel.recv()
-        return (msg as! C, Channel<D, E>(from: channel))
+    /// Receives a message from the endpoint and returns it along with the continuation endpoint.
+    /// - Parameter endpoint: The endpoint from which the message is received.
+    /// - Returns: A tuple containing the received message and the continuation endpoint.
+    static func recv<C, D, E>(from endpoint: Endpoint<Empty, (C, Endpoint<D, E>)>) async -> (C, Endpoint<D, E>) {
+        let msg = await endpoint.recv()
+        return (msg as! C, Endpoint<D, E>(from: endpoint))
     }
     
-    /// Offers a choice between two branches on the given channel, and returns the selected branch.
-    /// - Parameter channel: The channel on which the choice is offered. This channel expects a value indicating the selected branch (`true` for the first branch, `false` for the second branch).
-    /// - Returns: An `Or` enum value containing either the first branch channel of type `Channel<A, B>` or the second branch channel of type `Channel<C, D>`.
-    static func offer<A, B, C, D>(_ channel: Channel<Empty, Or<Channel<A, B>, Channel<C, D>>>) async -> Or<Channel<A, B>, Channel<C, D>> {
-        let bool = await channel.recv() as! Bool
+    /// Offers a choice between two branches on the given endpoint, and returns the selected branch.
+    /// - Parameter endpoint: The endpoint to which the choice is offered. This endpoint expects a value indicating the selected branch (`true` for the first branch, `false` for the second branch).
+    /// - Returns: An `Or` enum value containing either the first branch endpoint of type `Endpoint<A, B>` or the second branch endpoint of type `Endpoint<C, D>`.
+    static func offer<A, B, C, D>(_ endpoint: Endpoint<Empty, Or<Endpoint<A, B>, Endpoint<C, D>>>) async -> Or<Endpoint<A, B>, Endpoint<C, D>> {
+        let bool = await endpoint.recv() as! Bool
         if bool {
-            return Or.left(Channel<A, B>(from: channel))
+            return Or.left(Endpoint<A, B>(from: endpoint))
         } else {
-            return Or.right(Channel<C, D>(from: channel))
+            return Or.right(Endpoint<C, D>(from: endpoint))
         }
     }
     
-    /// Selects the left branch on the given channel and returns the continuation channel.
-    /// - Parameter channel: The channel on which the left branch is selected. This channel sends a value indicating the left branch selection (`true`).
-    /// - Returns: The continuation channel of type `Channel<B, A>`.
-    static func left<A, B, C, D>(_ channel: Channel<Or<Channel<A, B>, Channel<C, D>>, Empty>) -> Channel<B, A> {
-        return Channel<B, A>(from: channel)
+    /// Selects the left branch on the given endpoint and returns the continuation endpoint.
+    /// - Parameter endpoint: The endpoint on which the left branch is selected.
+    /// - Returns: The continuation endpoint of type `Endpoint<B, A>`.
+    static func left<A, B, C, D>(_ endpoint: Endpoint<Or<Endpoint<A, B>, Endpoint<C, D>>, Empty>) -> Endpoint<B, A> {
+        return Endpoint<B, A>(from: endpoint)
     }
     
-    /// Selects the right branch on the given channel and returns the continuation channel.
-    /// - Parameter channel: The channel on which the right branch is selected. This channel sends a value indicating the right branch selection (`false`).
-    /// - Returns: The continuation channel of type `Channel<D, C>`.
-    static func right<A, B, C, D>(_ channel: Channel<Or<Channel<A, B>, Channel<C, D>>, Empty>) -> Channel<D, C> {
-        return Channel<D, C>(from: channel)
+    /// Selects the right branch on the given endpoint and returns the continuation endpoint.
+    /// - Parameter endpoint: The endpoint on which the right branch is selected.
+    /// - Returns: The continuation endpoint of type `Endpoint<D, C>`.
+    static func right<A, B, C, D>(_ endpoint: Endpoint<Or<Endpoint<A, B>, Endpoint<C, D>>, Empty>) -> Endpoint<D, C> {
+        return Endpoint<D, C>(from: endpoint)
     }
     
 }

@@ -18,67 +18,66 @@ final class MathTests: XCTestCase {
         // A server that provides two groups of mathematical operations:
         // - basic arithmetic operations
         // - logarithms operations
-        let s = await Server { c in
-            await Session.offer(on: c) { c in
+        let s = await Server { e in
+            await Session.offer(on: e) { e in
                 
                 // Basic arithmetic operations
-                await Session.offer(on: c) { c in
+                await Session.offer(on: e) { e in
                     // Addition
-                    await Session.recv(from: c) { num1, c in
-                        await Session.recv(from: c) { num2, c in
+                    await Session.recv(from: e) { num1, e in
+                        await Session.recv(from: e) { num2, e in
                             let result: Int = num1 + num2
-                            await Session.send(result, on: c) { c in
-                                await Session.close(c)
+                            await Session.send(result, on: e) { e in
+                                await Session.close(e)
                             }
                         }
                     }
-                } or: { c in
+                } or: { e in
                     // Substraction
-                    await Session.recv(from: c) { num1, c in
-                        await Session.recv(from: c) { num2, c in
+                    await Session.recv(from: e) { num1, e in
+                        await Session.recv(from: e) { num2, e in
                             let result: Int = num1 - num2
-                            await Session.send(result, on: c) { c in
-                                await Session.close(c)
+                            await Session.send(result, on: e) { e in
+                                await Session.close(e)
                             }
                         }
                     }
                 }
                 
-            } or: { c in
+            } or: { e in
                 
                 // Logarithms operations
-                await Session.offer(on: c) { c in
+                await Session.offer(on: e) { e in
                     // Natural logarithm
-                    await Session.recv(from: c) { (number: Double, c) in
+                    await Session.recv(from: e) { (number: Double, e) in
                         let commonLogarithm = log(number)
-                        await Session.send(commonLogarithm, on: c) { c in
-                            await Session.close(c)
+                        await Session.send(commonLogarithm, on: e) { e in
+                            await Session.close(e)
                         }
                     }
-                } or: { c in
+                } or: { e in
                     // Common logarithm
-                    await Session.recv(from: c) { (number: Double, c) in
+                    await Session.recv(from: e) { (number: Double, e) in
                         let commonLogarithm = log10(number)
-                        await Session.send(commonLogarithm, on: c) { c in
-                            await Session.close(c)
+                        await Session.send(commonLogarithm, on: e) { e in
+                            await Session.close(e)
                         }
                     }
                 }
                 
             }
-
         }
         
         // A client that uses the addition operation provided by the server
-        let _ = await Client(for: s) { c in
+        let _ = await Client(for: s) { e in
             // Choose Basic arithmetic operations
-            await Session.left(c) { c in
+            await Session.left(e) { e in
                 // Choose addition operation
-                await Session.left(c) { c in
-                    await Session.send(5, on: c) { c in
-                        await Session.send(5, on: c) { c in
-                            await Session.recv(from: c) { result, c in
-                                await Session.close(c)
+                await Session.left(e) { e in
+                    await Session.send(5, on: e) { e in
+                        await Session.send(5, on: e) { e in
+                            await Session.recv(from: e) { result, e in
+                                await Session.close(e)
                                 assert(result == 10)
                             }
                         }
@@ -88,15 +87,15 @@ final class MathTests: XCTestCase {
         }
         
         // A client that uses the common logarithm operation provided by the server
-        let _ = await Client(for: s) { c in
+        let _ = await Client(for: s) { e in
             // Chooses logarithms operations
-            await Session.right(c) { c in
+            await Session.right(e) { e in
                 // Chooses common logarithm
-                await Session.right(c) { c in
+                await Session.right(e) { e in
                     let number: Double = 100.0 // Approximation of e
-                    await Session.send(number, on: c) { c in
-                        await Session.recv(from: c) { result, c in
-                            await Session.close(c)
+                    await Session.send(number, on: e) { e in
+                        await Session.recv(from: e) { result, e in
+                            await Session.close(e)
                             assert(result == 2.0)
                         }
                     }

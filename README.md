@@ -1,13 +1,13 @@
 # Swift Sessions
 
-**Swift Sessions** is a comprehensive Swift package that implements binary [session types](https://en.wikipedia.org/wiki/Session_type), providing a robust framework for ensuring safe and structured communication in concurrent systems.
+**Swift Sessions** is a Swift package that implements binary [session types](https://en.wikipedia.org/wiki/Session_type), providing a robust framework for ensuring safe and structured communication in concurrent systems.
 
 The library currently supports the following features:
 - session type inference (only with closures)
 - session types with binary branches
 - dynamic linearity checking
 - duality constraints on session types
-- client/server architecture for session initialization
+- session initialization with client/server architecture
 
 ## Authors and Acknowledgments
 
@@ -17,21 +17,21 @@ This library was developed as part of a Bachelor’s degree thesis project at th
 
 ### Programming Styles
 This library offers two distinct styles for managing session types:
-- **Continuation with Closures**: protocol continuations are passed as closures. This approach makes the flow of logic explicit and easy to follow within the closure context. It's particularly useful for straightforward communication sequences.
+- **Continuation with closures**: protocol continuations are passed as closures. This approach makes the flow of logic explicit and easy to follow within the closure context. It's particularly useful for straightforward communication sequences.
     
     ```swift
-    await Session.create { c in
+    await Session.create { e in
         // One side of the communication channel
-        await Session.recv(from: c) { num, c in
-            await Session.send(num % 2 == 0, on: c) { c in
-                await Session.close(c)
+        await Session.recv(from: e) { num, e in
+            await Session.send(num % 2 == 0, on: e) { e in
+                await Session.close(e)
             }
         }
     } _: { c in
         // Another side of the communication channel
-        await Session.send(42, on: c) { c in
-            await Session.recv(from: c) { isEven, c in
-                await Session.close(c)
+        await Session.send(42, on: e) { e in
+            await Session.recv(from: e) { isEven, e in
+                await Session.close(e)
             }
         }   
     }
@@ -40,22 +40,22 @@ This library offers two distinct styles for managing session types:
     - Pros: Complete type inference of the communication protocol.
 	- Cons: Nested code structure.
     
-- **Channel Passing for Continuation**: this style involves returning continuation channels from communication primitives. It offers greater flexibility, enabling more modular and reusable code, particularly for complex communication sequences.
+- **Continuations with endpoint passing**: this style involves returning continuation endpoints from communication primitives. It offers greater flexibility, enabling more modular and reusable code, particularly for complex communication sequences.
 
     ```swift
-    typealias Communication = Channel<Empty, (Int, Channel<(Bool, Channel<Empty, Empty>), Empty>)>
-        
+    typealias Protocol = Endpoint<Empty, (Int, Endpoint<(Bool, Endpoint<Empty, Empty>), Empty>)>
+    
     // One side of the communication channel
-    let c = await Session.create { (c: Communication) in
-        let (num, c1) = await Session.recv(from: c)
-        let c2 = await Session.send(num % 2 == 0, on: c1)
-        await Session.close(c2)
+    let e = await Session.create { (e: Protocol) in
+        let (num, e1) = await Session.recv(from: e)
+        let e2 = await Session.send(num % 2 == 0, on: e1)
+        await Session.close(e2)
     }
-
+        
     // Another side of the communication channel
-    let c1 = await Session.send(42, on: c)
-    let (isEven, c2) = await Session.recv(from: c1)
-    await Session.close(c2)
+    let e1 = await Session.send(42, on: e)
+    let (isEven, e2) = await Session.recv(from: e1)
+    await Session.close(e2)
     ```
     
     - Pros: Simplicity, particularly for avoiding deep indentation.
@@ -64,7 +64,8 @@ This library offers two distinct styles for managing session types:
 Each style provides a unique approach to handling session-based binary communication and comes with its own pros and cons. By supporting both styles, SwiftSessions allows you to choose the best approach (or use both in a hybrid way!) according to your needs and coding preferences.
 
 For additional examples, see the [Tests](Tests) folder.
- 
+
+
 ### Client/Server Architecture
 
 Instead of creating disposable sessions as seen in the previous examples, you can also initialize sessions using a client/server architectural style.
@@ -73,19 +74,19 @@ A **server** is responsible for creating and managing multiple sessions that can
 
 ```swift
 // Server side
-let server = await Server { c in
-    await Session.recv(from: c) { num, c in
-        await Session.send(num % 2 == 0, on: c) { c in
-            await Session.close(c)
+let server = await Server { e in
+    await Session.recv(from: e) { num, e in
+        await Session.send(num % 2 == 0, on: e) { e in
+            await Session.close(e)
         }
     }
 }
 
 // Client side
-let c1 = await Client(for: server) { c in
-    await Session.send(42, on: c) { c in
-        await Session.recv(from: c) { isEven, c in
-            await Session.close(c)
+let c1 = await Client(for: server) { e in
+    await Session.send(42, on: e) { e in
+        await Session.recv(from: e) { isEven, e in
+            await Session.close(e)
         }
     }
 }

@@ -7,7 +7,7 @@
 
 import Foundation
 
-/// Represents an empty type used for parts of a channel where no message sending or receiving is allowed.
+/// Represents an empty type used for parts of an endpoint where no message sending or receiving is allowed.
 enum Empty {
     
 }
