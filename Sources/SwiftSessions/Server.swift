@@ -12,7 +12,7 @@ import AsyncAlgorithms
 public class Server<A, B> {
     
     /// The public channel for receiving session requests from clients.
-    let publicChannel: AsyncChannel<Sendable>
+    private let publicChannel: AsyncChannel<Sendable>
     
     /// Initializes a new server instance that listens for client sessions.
     /// - Parameter closure: The closure to execute on the server's channel for each session.

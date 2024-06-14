@@ -46,14 +46,16 @@ extension Session {
     /// Selects the left branch on the given endpoint and returns the continuation endpoint.
     /// - Parameter endpoint: The endpoint on which the left branch is selected.
     /// - Returns: The continuation endpoint of type `Endpoint<B, A>`.
-    static func left<A, B, C, D>(_ endpoint: Endpoint<Or<Endpoint<A, B>, Endpoint<C, D>>, Empty>) -> Endpoint<B, A> {
+    static func left<A, B, C, D>(_ endpoint: Endpoint<Or<Endpoint<A, B>, Endpoint<C, D>>, Empty>) async -> Endpoint<B, A> {
+        await endpoint.send(true)
         return Endpoint<B, A>(from: endpoint)
     }
     
     /// Selects the right branch on the given endpoint and returns the continuation endpoint.
     /// - Parameter endpoint: The endpoint on which the right branch is selected.
     /// - Returns: The continuation endpoint of type `Endpoint<D, C>`.
-    static func right<A, B, C, D>(_ endpoint: Endpoint<Or<Endpoint<A, B>, Endpoint<C, D>>, Empty>) -> Endpoint<D, C> {
+    static func right<A, B, C, D>(_ endpoint: Endpoint<Or<Endpoint<A, B>, Endpoint<C, D>>, Empty>) async -> Endpoint<D, C> {
+        await endpoint.send(false)
         return Endpoint<D, C>(from: endpoint)
     }
     

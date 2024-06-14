@@ -60,7 +60,7 @@ class Session {
     
     /// Closes the endpoint, indicating the end of communication.
     /// - Parameter endpoint: The endpoint to close the communication.
-    static func close(_ endpoint: Endpoint<Empty, Empty>) async {
+    static func close(_ endpoint: Endpoint<Empty, Empty>) {
         endpoint.close()
     }
     

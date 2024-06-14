@@ -20,7 +20,7 @@ final class BranchingTests: XCTestCase {
                     await Session.recv(from: e) { num2, e in
                         let sum: Int = num1 + num2
                         await Session.send(sum, on: e) { e in
-                            await Session.close(e)
+                            Session.close(e)
                         }
                     }
                 }
@@ -31,7 +31,7 @@ final class BranchingTests: XCTestCase {
                         result *= i
                     }
                     await Session.send(result, on: e) { e in
-                        await Session.close(e)
+                        Session.close(e)
                     }
                 }
             }
@@ -43,7 +43,7 @@ final class BranchingTests: XCTestCase {
             await Session.send(2, on: e) { e in
                 await Session.send(3, on: e) { e in
                     await Session.recv(from: e) { result, e in
-                        await Session.close(e)
+                        Session.close(e)
                         assert(result == 5)
                     }
                 }
@@ -59,7 +59,7 @@ final class BranchingTests: XCTestCase {
                     await Session.recv(from: e) { num2, e in
                         let sum: Int = num1 + num2
                         await Session.send(sum, on: e) { e in
-                            await Session.close(e)
+                            Session.close(e)
                         }
                     }
                 }
@@ -70,7 +70,7 @@ final class BranchingTests: XCTestCase {
                         result *= i
                     }
                     await Session.send(result, on: e) { e in
-                        await Session.close(e)
+                        Session.close(e)
                     }
                 }
             }
@@ -81,7 +81,7 @@ final class BranchingTests: XCTestCase {
         await Session.right(e) { e in
             await Session.send(3, on: e) { e in
                 await Session.recv(from: e) { result, e in
-                    await Session.close(e)
+                    Session.close(e)
                     assert(result == 6)
                 }
             }

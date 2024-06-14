@@ -21,19 +21,19 @@ final class LinearityTests: XCTestCase {
         await Session.create { e in
             await Session.recv(from: e) { num, e1 in
                 await Session.send(num % 2 == 0, on: e1) { e2 in
-                    await Session.close(e2)
+                    Session.close(e2)
                     
                     // Using endpoint e1 again
                     // This is a linearity violation
                     await Session.send(false, on: e1) { e3 in
-                        await Session.close(e3)
+                        Session.close(e3)
                     }
                 }
             }
         } _: { e in
             await Session.send(42, on: e) { e1 in
                 await Session.recv(from: e1) { (isEven: Bool, e2) in
-                    await Session.close(e2)
+                    Session.close(e2)
                 }
             }
         }
@@ -47,7 +47,7 @@ final class LinearityTests: XCTestCase {
         await Session.create { e in
             await Session.recv(from: e) { num, e in
                 await Session.send(num % 2 == 0, on: e) { e in
-                    await Session.close(e)
+                    Session.close(e)
                 }
             }
         } _: { e in

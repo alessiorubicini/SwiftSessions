@@ -27,14 +27,14 @@ This library offers two distinct styles for managing session types:
         // One side of the communication channel
         await Session.recv(from: e) { num, e in
             await Session.send(num % 2 == 0, on: e) { e in
-                await Session.close(e)
+                Session.close(e)
             }
         }
     } _: { c in
         // Another side of the communication channel
         await Session.send(42, on: e) { e in
             await Session.recv(from: e) { isEven, e in
-                await Session.close(e)
+                Session.close(e)
             }
         }   
     }
@@ -52,13 +52,13 @@ This library offers two distinct styles for managing session types:
     let e = await Session.create { (e: Protocol) in
         let (num, e1) = await Session.recv(from: e)
         let e2 = await Session.send(num % 2 == 0, on: e1)
-        await Session.close(e2)
+        Session.close(e2)
     }
         
     // Another side of the communication channel
     let e1 = await Session.send(42, on: e)
     let (isEven, e2) = await Session.recv(from: e1)
-    await Session.close(e2)
+    Session.close(e2)
     ```
     
     - Pros: Simplicity, particularly for avoiding deep indentation.
@@ -80,7 +80,7 @@ A **server** is responsible for creating and managing multiple sessions that can
 let server = await Server { e in
     await Session.recv(from: e) { num, e in
         await Session.send(num % 2 == 0, on: e) { e in
-            await Session.close(e)
+            Session.close(e)
         }
     }
 }
@@ -89,7 +89,7 @@ let server = await Server { e in
 let c1 = await Client(for: server) { e in
     await Session.send(42, on: e) { e in
         await Session.recv(from: e) { isEven, e in
-            await Session.close(e)
+            Session.close(e)
         }
     }
 }

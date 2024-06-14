@@ -19,14 +19,14 @@ final class LoopTests: XCTestCase {
         let s = await Server { e in
             await Session.recv(from: e) { num, e in
                 sum += num
-                await Session.close(e)
+                Session.close(e)
             }
         }
         
         for number in numbers {
             let _ = await Client(for: s) { e in
                 await Session.send(number, on: e) { e in
-                    await Session.close(e)
+                    Session.close(e)
                 }
             }
         }

@@ -19,14 +19,14 @@ final class StandardTests: XCTestCase {
             // One side of the communication channel
             await Session.recv(from: e) { num, e in
                 await Session.send(num % 2 == 0, on: e) { e in
-                    await Session.close(e)
+                    Session.close(e)
                 }
             }
         } _: { e in
             // Another side of the communication channel
             await Session.send(42, on: e) { e in
                 await Session.recv(from: e) { isEven, e in
-                    await Session.close(e)
+                    Session.close(e)
                     assert(isEven == true)
                 }
             }   
@@ -42,13 +42,13 @@ final class StandardTests: XCTestCase {
         let e = await Session.create { (e: Protocol) in
             let (num, e1) = await Session.recv(from: e)
             let e2 = await Session.send(num % 2 == 0, on: e1)
-            await Session.close(e2)
+            Session.close(e2)
         }
         
         // Another side of the communication channel
         let e1 = await Session.send(42, on: e)
         let (isEven, e2) = await Session.recv(from: e1)
-        await Session.close(e2)
+        Session.close(e2)
         
         assert(isEven == true)
     }
@@ -60,7 +60,7 @@ final class StandardTests: XCTestCase {
         let s = await Server { e in
             await Session.recv(from: e) { num, e in
                 await Session.send(num % 2 == 0, on: e) { e in
-                    await Session.close(e)
+                    Session.close(e)
                 }
             }
         }
@@ -69,7 +69,7 @@ final class StandardTests: XCTestCase {
         let _ = await Client(for: s) { e in
             await Session.send(42, on: e) { e in
                 await Session.recv(from: e) { isEven, e in
-                    await Session.close(e)
+                    Session.close(e)
                     assert(isEven == true)
                 }
             }
@@ -79,7 +79,7 @@ final class StandardTests: XCTestCase {
         let _ = await Client(for: s) { e in
             await Session.send(3, on: e) { e in
                 await Session.recv(from: e) { isEven, e in
-                    await Session.close(e)
+                    Session.close(e)
                     assert(isEven == false)
                 }
             }

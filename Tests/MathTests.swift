@@ -28,7 +28,7 @@ final class MathTests: XCTestCase {
                         await Session.recv(from: e) { num2, e in
                             let result: Int = num1 + num2
                             await Session.send(result, on: e) { e in
-                                await Session.close(e)
+                                Session.close(e)
                             }
                         }
                     }
@@ -38,7 +38,7 @@ final class MathTests: XCTestCase {
                         await Session.recv(from: e) { num2, e in
                             let result: Int = num1 - num2
                             await Session.send(result, on: e) { e in
-                                await Session.close(e)
+                                Session.close(e)
                             }
                         }
                     }
@@ -52,7 +52,7 @@ final class MathTests: XCTestCase {
                     await Session.recv(from: e) { (number: Double, e) in
                         let commonLogarithm = log(number)
                         await Session.send(commonLogarithm, on: e) { e in
-                            await Session.close(e)
+                            Session.close(e)
                         }
                     }
                 } or: { e in
@@ -60,7 +60,7 @@ final class MathTests: XCTestCase {
                     await Session.recv(from: e) { (number: Double, e) in
                         let commonLogarithm = log10(number)
                         await Session.send(commonLogarithm, on: e) { e in
-                            await Session.close(e)
+                            Session.close(e)
                         }
                     }
                 }
@@ -77,7 +77,7 @@ final class MathTests: XCTestCase {
                     await Session.send(5, on: e) { e in
                         await Session.send(5, on: e) { e in
                             await Session.recv(from: e) { result, e in
-                                await Session.close(e)
+                                Session.close(e)
                                 assert(result == 10)
                             }
                         }
@@ -95,7 +95,7 @@ final class MathTests: XCTestCase {
                     let number: Double = 100.0 // Approximation of e
                     await Session.send(number, on: e) { e in
                         await Session.recv(from: e) { result, e in
-                            await Session.close(e)
+                            Session.close(e)
                             assert(result == 2.0)
                         }
                     }
