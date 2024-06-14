@@ -18,17 +18,17 @@ extension Session {
     ///   - payload: The payload to be sent to the endpoint.
     ///   - endpoint: The endpoint to which the payload is sent.
     /// - Returns: The continuation endpoint
-    static func send<C, D, E>(_ payload: C, on endpoint: Endpoint<(C, Endpoint<D, E>), Empty>) async -> Endpoint<E, D> {
+    static func send<A, B, C>(_ payload: A, on endpoint: Endpoint<(A, Endpoint<B, C>), Empty>) async -> Endpoint<C, B> {
         await endpoint.send(payload)
-        return Endpoint<E, D>(from: endpoint)
+        return Endpoint<C, B>(from: endpoint)
     }
     
     /// Receives a message from the endpoint and returns it along with the continuation endpoint.
     /// - Parameter endpoint: The endpoint from which the message is received.
     /// - Returns: A tuple containing the received message and the continuation endpoint.
-    static func recv<C, D, E>(from endpoint: Endpoint<Empty, (C, Endpoint<D, E>)>) async -> (C, Endpoint<D, E>) {
+    static func recv<A, B, C>(from endpoint: Endpoint<Empty, (A, Endpoint<B, C>)>) async -> (A, Endpoint<B, C>) {
         let msg = await endpoint.recv()
-        return (msg as! C, Endpoint<D, E>(from: endpoint))
+        return (msg as! A, Endpoint<B, C>(from: endpoint))
     }
     
     /// Offers a choice between two branches on the given endpoint, and returns the selected branch.

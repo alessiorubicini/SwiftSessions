@@ -1,5 +1,5 @@
 //
-//  Channel.swift
+//  Endpoint.swift
 //
 //
 //  Created by Alessio Rubicini on 04/05/24.
@@ -19,7 +19,7 @@ import AsyncAlgorithms
 public final class Endpoint<A, B> {
     
     /// Underlying asynchronous channel for communication.
-    public let asyncChannel: AsyncChannel<Sendable>
+    private let channel: AsyncChannel<Sendable>
     
     /// A read-only flag indicating whether the instance has been consumed.
     ///
@@ -29,13 +29,13 @@ public final class Endpoint<A, B> {
     /// Initializes a new endpoint with the given asynchronous channel.
     /// - Parameter channel: The underlying asynchronous channel for communication.
     init(with channel: AsyncChannel<Sendable>) {
-        self.asyncChannel = channel
+        self.channel = channel
     }
     
     /// Initializes a new channel from an existing channel
     /// - Parameter channel: The channel from which to create the new channel.
     init<C, D>(from endpoint: Endpoint<C, D>) {
-        self.asyncChannel = endpoint.asyncChannel
+        self.channel = endpoint.channel
     }
     
     /// Deinitializes the channel and ensures it has been consumed.
@@ -66,7 +66,7 @@ public final class Endpoint<A, B> {
     
     /// A human-readable description of the channel, including the message types.
     public var description: String {
-        "Channel<\(A.self), \(B.self)>"
+        "Endpoint<\(A.self), \(B.self)>"
     }
     
 }
@@ -81,7 +81,7 @@ extension Endpoint where A == Empty {
     /// - Returns: the element received
     func recv() async -> Sendable {
         consume()
-        return await asyncChannel.first(where: { _ in true })!
+        return await channel.first(where: { _ in true })!
     }
     
 }
@@ -96,7 +96,7 @@ extension Endpoint where B == Empty {
     /// - Throws: a fatal error if the channel has already been consumed.
     func send(_ element: Sendable) async {
         consume()
-        await asyncChannel.send(element)
+        await channel.send(element)
     }
     
 }
@@ -109,7 +109,7 @@ extension Endpoint where A == Empty, B == Empty {
     /// This method closes the channel, signaling the end of communication.
     func close() {
         consume()
-        asyncChannel.finish()
+        channel.finish()
     }
     
 }

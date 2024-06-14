@@ -21,7 +21,8 @@ extension Session {
     ///                    This closure receives the continuation endpoint for further communication.
     static func send<A, B, C>(_ payload: A, on endpoint: Endpoint<(A, Endpoint<B, C>), Empty>, continuation: @escaping (Endpoint<C, B>) async -> Void) async {
         await endpoint.send(payload)
-        await continuation(Endpoint<C, B>(from: endpoint))
+        let continuationEndpoint = Endpoint<C, B>(from: endpoint)
+        await continuation(continuationEndpoint)
     }
     
     /// Receives a message from the channel and invokes the specified closure upon completion.
@@ -31,7 +32,8 @@ extension Session {
     ///                    This closure receives the received message and the continuation endpoint.
     static func recv<A, B, C>(from endpoint: Endpoint<Empty, (A, Endpoint<B, C>)>, continuation: @escaping ((A, Endpoint<B, C>)) async -> Void) async {
         let msg = await endpoint.recv()
-        await continuation((msg as! A, Endpoint<B, C>(from: endpoint)))
+        let continuationEndpoint = Endpoint<B, C>(from: endpoint)
+        await continuation((msg as! A, continuationEndpoint))
     }
     
     /// Offers a choice between two branches on the given channel, and executes the corresponding closure based on the selected branch.
@@ -42,9 +44,11 @@ extension Session {
     static func offer<A, B, C, D>(on endpoint: Endpoint<Empty, Or<Endpoint<A, B>, Endpoint<C, D>>>, _ side1: @escaping (Endpoint<A, B>) async -> Void, or side2: @escaping (Endpoint<C, D>) async -> Void) async {
         let bool = await endpoint.recv() as! Bool
         if bool {
-            await side1(Endpoint<A, B>(from: endpoint))
+            let continuationEndpoint = Endpoint<A, B>(from: endpoint)
+            await side1(continuationEndpoint)
         } else {
-            await side2(Endpoint<C, D>(from: endpoint))
+            let continuationEndpoint = Endpoint<C, D>(from: endpoint)
+            await side2(continuationEndpoint)
         }
     }
     
@@ -54,7 +58,8 @@ extension Session {
     ///   - continuation: A closure to be executed after the left branch is selected. This closure receives a endpoint of type `Endpoint<B, A>`.
     static func left<A, B, C, D>(_ endpoint: Endpoint<Or<Endpoint<A, B>, Endpoint<C, D>>, Empty>, continuation: @escaping (Endpoint<B, A>) async -> Void) async {
         await endpoint.send(true)
-        await continuation(Endpoint<B, A>(from: endpoint))
+        let continuationEndpoint = Endpoint<B, A>(from: endpoint)
+        await continuation(continuationEndpoint)
     }
     
     /// Selects the right branch on the given channel and executes the provided continuation closure.
@@ -63,7 +68,8 @@ extension Session {
     ///   - continuation: A closure to be executed after the right branch is selected. This closure receives a endpoint of type `Endpoint<D, C>`.
     static func right<A, B, C, D>(_ endpoint: Endpoint<Or<Endpoint<A, B>, Endpoint<C, D>>, Empty>, continuation: @escaping (Endpoint<D, C>) async -> Void) async {
         await endpoint.send(false)
-        await continuation(Endpoint<D, C>(from: endpoint))
+        let continuationEndpoint = Endpoint<D, C>(from: endpoint)
+        await continuation(continuationEndpoint)
     }
     
 }
