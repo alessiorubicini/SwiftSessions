@@ -1,10 +1,22 @@
-# Swift Sessions
+<div align="center">
+  <img width="300" height="300" src="/Resources/icon.png" alt="Package Logo">
+  <h1><b>Swift Sessions</b></h1>
+  <p>
+    Swift Sessions is a Swift package that implements binary <a href="https://en.wikipedia.org/wiki/Session_type" target="_blank">session types</a>, providing a robust framework for ensuring safe and structured communication in concurrent systems.
+    <br>
+  </p>
+</div>
 
-[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Falessiorubicini%2FSwiftSessions%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/alessiorubicini/SwiftSessions)
-[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Falessiorubicini%2FSwiftSessions%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/alessiorubicini/SwiftSessions)
+<div align="center">
+	<a href="https://swiftpackageindex.com/alessiorubicini/SwiftSessions">
+		<img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Falessiorubicini%2FSwiftSessions%2Fbadge%3Ftype%3Dswift-versions" alt="Swift Versions">
+	</a>
+	<a href="https://swiftpackageindex.com/alessiorubicini/SwiftSessions">
+		<img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Falessiorubicini%2FSwiftSessions%2Fbadge%3Ftype%3Dplatforms" alt="Supported Platforms">
+	</a>
+</div>
 
-**Swift Sessions** is a Swift package that implements binary [session types](https://en.wikipedia.org/wiki/Session_type), providing a robust framework for ensuring safe and structured communication in concurrent systems.
-
+## Features
 The library currently supports the following features:
 - session type inference (only with closures)
 - session types with binary branches
